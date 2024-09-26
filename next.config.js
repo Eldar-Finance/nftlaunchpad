@@ -1,6 +1,5 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  distDir: 'build',
   transpilePackages: ['@multiversx/sdk-dapp'],
   webpack: (config) => {
     config.resolve.fallback = { fs: false };
