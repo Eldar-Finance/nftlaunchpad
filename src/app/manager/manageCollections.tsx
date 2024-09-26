@@ -1,14 +1,13 @@
 'use client'
 
-import { useState, useEffect } from 'react'
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 import { Label } from "@/components/ui/label"
 import { 
-  Tag, FileText, Image as ImageIcon, Hash, DollarSign, 
+  Tag, Image as ImageIcon, Hash, DollarSign, 
   LayoutGrid, Users, Pause, Play, Lock, Unlock, RefreshCw,
-  User, Fingerprint, FileType, BookOpen
+ Fingerprint, FileType, CheckCircle, XCircle
 } from 'lucide-react'
 import { useGetCollectionsInfo } from '@/hooks/useGetCollectionsInfo'
 
@@ -33,7 +32,7 @@ export default function CollectionManager({ collectionAddress }: { collectionAdd
   const info = collectionsInfo[0] // We're only managing one collection at a time
 
   return (
-    <div className="min-h-screen bg-gray-950 text-gray-200 p-8">
+    <div className="min-h-screen bg-gray-950 text-gray-200 p-8 ">
       <Card className="w-full max-w-6xl mx-auto bg-gray-900 border-gray-800 shadow-xl">
         <CardHeader className="border-b border-gray-800">
           <CardTitle className="text-3xl font-bold text-center text-white">
@@ -55,7 +54,7 @@ export default function CollectionManager({ collectionAddress }: { collectionAdd
             <InfoCard
               icon={<DollarSign className="w-5 h-5 text-green-400" />}
               label="Royalties"
-              value={`${info.royalties}%`}
+              value={`${info.royalties / 100}%`}
             />
             <InfoCard
               icon={<LayoutGrid className="w-5 h-5 text-blue-400" />}
@@ -77,7 +76,11 @@ export default function CollectionManager({ collectionAddress }: { collectionAdd
               label="Single NFT Name"
               value={info.singleNftName}
             />
-
+            <InfoCard
+              icon={<FileType className="w-5 h-5 text-orange-400" />}
+              label="File Ending"
+              value={info.fileEnding}
+            />
           </div>
 
           <Card className="bg-gray-800 border-gray-700">
@@ -95,7 +98,7 @@ export default function CollectionManager({ collectionAddress }: { collectionAdd
             </CardHeader>
             <CardContent>
               <div className="flex flex-wrap gap-2">
-                {info.tags.split(',').map((tag, index) => (
+                {info.tags.split(' ').map((tag, index) => (
                   <span key={index} className="px-2 py-1 bg-gray-700 rounded-full text-sm text-gray-300">
                     {tag.trim()}
                   </span>
@@ -113,9 +116,34 @@ export default function CollectionManager({ collectionAddress }: { collectionAdd
                 {info.mintCosts.map((cost, index) => (
                   <div key={index} className="flex justify-between items-center bg-gray-700 p-3 rounded-lg">
                     <span className="text-gray-300">{cost.tokenIdentifier}</span>
-                    <span className="text-white font-medium">{cost.amount}</span>
+                    <span className="text-white font-medium">{cost.amount / 1e18}</span>
                   </div>
                 ))}
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="bg-gray-800 border-gray-700">
+            <CardHeader>
+              <CardTitle className="text-xl font-semibold text-white">Collection Status</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <StatusItem
+                  label="JSON Metadata"
+                  value={info.hasJsonMetadata}
+                  icon={info.hasJsonMetadata ? <CheckCircle className="w-5 h-5 text-green-400" /> : <XCircle className="w-5 h-5 text-red-400" />}
+                />
+                <StatusItem
+                  label="Minting Enabled"
+                  value={info.isMintingEnabled}
+                  icon={info.isMintingEnabled ? <CheckCircle className="w-5 h-5 text-green-400" /> : <XCircle className="w-5 h-5 text-red-400" />}
+                />
+                <StatusItem
+                  label="Paused"
+                  value={info.isPaused}
+                  icon={info.isPaused ? <CheckCircle className="w-5 h-5 text-red-400" /> : <XCircle className="w-5 h-5 text-green-400" />}
+                />
               </div>
             </CardContent>
           </Card>
@@ -140,27 +168,13 @@ export default function CollectionManager({ collectionAddress }: { collectionAdd
               tooltipText="Claim accumulated royalties for this collection"
             />
           </div>
-
-          <Card className="bg-gray-800 border-gray-700">
-            <CardHeader>
-              <CardTitle className="text-xl font-semibold text-white">Additional Information</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <InfoItem label="Has JSON Metadata" value={info.hasJsonMetadata ? 'Yes' : 'No'} />
-                <InfoItem label="Is Minting Enabled" value={info.isMintingEnabled ? 'Yes' : 'No'} />
-                <InfoItem label="Is Paused" value={info.isPaused ? 'Yes' : 'No'} />
-                <InfoItem label="Collection Address" value={info.address} />
-              </div>
-            </CardContent>
-          </Card>
         </CardContent>
       </Card>
     </div>
   )
 }
 
-const InfoCard = ({ icon, label, value }: { icon: React.ReactNode; label: string; value: string | number }) => (
+const InfoCard = ({ icon, label, value }: { icon: React.ReactNode; label: string; value: string }) => (
   <div className="bg-gray-800 p-4 rounded-lg border border-gray-700">
     <div className="flex items-center space-x-3 mb-2">
       {icon}
@@ -170,10 +184,13 @@ const InfoCard = ({ icon, label, value }: { icon: React.ReactNode; label: string
   </div>
 )
 
-const InfoItem = ({ label, value }: { label: string; value: string | number }) => (
-  <div className="flex justify-between items-center bg-gray-700 p-3 rounded-lg">
+const StatusItem = ({ label, value, icon }: { label: string; value: boolean; icon: React.ReactNode }) => (
+  <div className="flex items-center justify-between bg-gray-700 p-3 rounded-lg">
     <span className="text-gray-300">{label}</span>
-    <span className="text-white font-medium">{value}</span>
+    <div className="flex items-center">
+      <span className="text-white font-medium mr-2">{value ? 'Yes' : 'No'}</span>
+      {icon}
+    </div>
   </div>
 )
 

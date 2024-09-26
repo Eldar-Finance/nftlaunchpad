@@ -1,10 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useGetNetworkConfig } from '@/hooks';
 import {
-  SmartContract,
-  Address,
   ContractFunction,
-  ResultsParser
 } from '@multiversx/sdk-core';
 import {
     ProxyNetworkProvider,
@@ -52,41 +49,46 @@ export const useGetCollectionsInfo = (collectionAddresses: string[]) => {
           });
           const response = await proxy.queryContract(query);
 
-          // Log the raw returned data
-          console.log(`Raw returned data for address ${address}:`, response.returnData);
+          
+          // Decode the returnData
+          const decodedData = response.returnData.map((data: string) => Buffer.from(data, 'base64').toString('hex'));
 
-          // Helper function to decode base64 strings
-          const decodeBase64 = (data: string) => Buffer.from(data, 'base64').toString('utf-8');
+          // Log the raw decoded data
+          console.log(`Raw decoded data for address ${address}:`, response.returnData);
 
-          // Helper function to convert hex to decimal
+          // Convert hex to decimal for numeric fields
           const hexToDecimal = (hex: string) => parseInt(hex, 16);
+          const hexToString = (hex: string) => Buffer.from(hex, 'hex').toString('utf-8');
+
 
           // Construct the collection info object
           const collectionInfo: CollectionInfo = {
             address,
-            creatorAddress: new Address(decodeBase64(response.returnData[0])).bech32(),
-            collectionIdentifier: decodeBase64(response.returnData[1]),
-            collectionName: decodeBase64(response.returnData[2]),
-            singleNftName: decodeBase64(response.returnData[3]),
-            ticker: decodeBase64(response.returnData[4]),
-            description: decodeBase64(response.returnData[5]),
-            ipfsCid: decodeBase64(response.returnData[6]),
-            fileEnding: decodeBase64(response.returnData[7]),
-            tags: decodeBase64(response.returnData[8]),
-            royalties: hexToDecimal(response.returnData[9]) / 100, // Assuming royalties are in percentage with 2 decimal places
-            maxSupply: hexToDecimal(response.returnData[10]),
-            maxAmountPerMint: hexToDecimal(response.returnData[11]),
-            totalNftsMinted: hexToDecimal(response.returnData[12]),
-            hasJsonMetadata: decodeBase64(response.returnData[13]) === 'true',
-            isMintingEnabled: decodeBase64(response.returnData[14]) === 'true',
-            isPaused: decodeBase64(response.returnData[15]) === 'true',
-            mintCosts: response.returnData.slice(16).map((cost) => {
-              const [tokenIdentifier, amount] = decodeBase64(cost).split(',');
-              return {
-                tokenIdentifier,
-                amount: Number(hexToDecimal(amount))
-              };
-            })
+            creatorAddress: hexToString(decodedData[0]),
+            collectionIdentifier: hexToString(decodedData[1]),
+            collectionName: hexToString(decodedData[2]),
+            singleNftName: hexToString(decodedData[3]),
+            ticker: hexToString(decodedData[4]),
+            description: hexToString(decodedData[5]),
+            ipfsCid: hexToString(decodedData[6]),
+            fileEnding: hexToString(decodedData[7]),
+            tags: hexToString(decodedData[8]),
+            royalties: hexToDecimal(decodedData[9]) ,
+            maxSupply: hexToDecimal(decodedData[10]),
+            maxAmountPerMint: hexToDecimal(decodedData[11]),
+            totalNftsMinted: hexToDecimal(decodedData[12]),
+            hasJsonMetadata: decodedData[13] === 'true',
+            isMintingEnabled: decodedData[14] === 'true',
+            isPaused: decodedData[15] === 'true',
+            mintCosts: decodedData.slice(16).map((cost, index, array) => {
+                if (index % 2 === 0) {
+                    return {
+                        tokenIdentifier: hexToString(cost),
+                        amount: hexToDecimal(array[index + 1] || '0')
+                    };
+                }
+                return undefined;
+            }).filter((item): item is { tokenIdentifier: string; amount: number } => item !== undefined),
           };
 
           fetchedCollectionsInfo.push(collectionInfo);
