@@ -55,8 +55,26 @@ export const Header = () => {
         <Image src={mvxLogo} alt='MultiversX Logo' className='w-auto h-8' />
       </MxLink>
 
-      {/* Mini Icon Menu */}
-      <nav className='hidden sm:flex items-center space-x-2'>
+      {/* Centered Menu */}
+      <nav className='hidden md:flex items-center justify-center flex-1'>
+        {menuItems.map((item) => (
+          <MxLink key={item.label} to={item.route}>
+            <Button
+              variant="ghost"
+              size="sm"
+              className={`text-gray-300 hover:text-white hover:bg-gray-800 transition-colors mx-2 ${
+                pathname === item.route ? 'bg-gray-800 text-white' : ''
+              }`}
+            >
+              <item.icon className="w-5 h-5 mr-2" />
+              {item.label}
+            </Button>
+          </MxLink>
+        ))}
+      </nav>
+
+      {/* Mobile Menu */}
+      <nav className='md:hidden flex items-center space-x-2'>
         <TooltipProvider>
           {menuItems.map((item) => (
             <Tooltip key={item.label}>
@@ -81,8 +99,8 @@ export const Header = () => {
         </TooltipProvider>
       </nav>
 
-      <nav className='flex items-center space-x-6'>
-        <div className='flex items-center space-x-2'>
+      <div className='flex items-center space-x-6'>
+        <div className='hidden sm:flex items-center space-x-2'>
           <div className='w-2 h-2 rounded-full bg-green-500' />
           <p className='text-gray-400 text-xs font-medium'>{environment}</p>
         </div>
@@ -100,7 +118,7 @@ export const Header = () => {
         ) : (
           ConnectButton
         )}
-      </nav>
+      </div>
     </header>
   );
 };
