@@ -59,16 +59,16 @@ export const Header = () => {
       <nav className='hidden md:flex items-center justify-center flex-1'>
         {menuItems.map((item) => (
           <MxLink key={item.label} to={item.route}>
-            <Button
-              variant="ghost"
-              size="sm"
-              className={`text-gray-300 hover:text-white hover:bg-gray-800 transition-colors mx-2 ${
-                pathname === item.route ? 'bg-gray-800 text-white' : ''
-              }`}
+            <div
+              className={`flex items-center px-4 py-2 mx-2 rounded-md text-sm font-medium transition-colors
+                ${pathname === item.route 
+                  ? 'bg-gray-800 text-white' 
+                  : 'text-gray-300 hover:bg-gray-800 hover:text-white'
+                }`}
             >
               <item.icon className="w-5 h-5 mr-2" />
               {item.label}
-            </Button>
+            </div>
           </MxLink>
         ))}
       </nav>
@@ -80,15 +80,15 @@ export const Header = () => {
             <Tooltip key={item.label}>
               <TooltipTrigger asChild>
                 <MxLink to={item.route}>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className={`text-gray-400 hover:text-white hover:bg-gray-800 transition-colors ${
-                      pathname === item.route ? 'bg-gray-800 text-white' : ''
-                    }`}
+                  <div
+                    className={`p-2 rounded-md transition-colors
+                      ${pathname === item.route 
+                        ? 'bg-gray-800 text-white' 
+                        : 'text-gray-400 hover:bg-gray-800 hover:text-white'
+                      }`}
                   >
                     <item.icon className="w-5 h-5" />
-                  </Button>
+                  </div>
                 </MxLink>
               </TooltipTrigger>
               <TooltipContent side="bottom" className="bg-gray-800 text-white border-gray-700">
@@ -106,15 +106,13 @@ export const Header = () => {
         </div>
 
         {isLoggedIn ? (
-          <Button
+          <button
             onClick={handleLogout}
-            variant="ghost"
-            size="sm"
-            className='text-gray-300 hover:bg-gray-800 hover:text-white transition-colors'
+            className='flex items-center px-4 py-2 text-sm font-medium text-gray-300 hover:bg-gray-800 hover:text-white rounded-md transition-colors'
           >
             <Power className="w-4 h-4 mr-2" />
             Logout
-          </Button>
+          </button>
         ) : (
           ConnectButton
         )}

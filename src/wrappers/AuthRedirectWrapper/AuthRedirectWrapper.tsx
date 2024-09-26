@@ -1,9 +1,9 @@
 'use client';
 import { useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import type { PropsWithChildren } from 'react';
 import { useGetIsLoggedIn } from '@/hooks';
-import { RouteNamesEnum } from '@/localConstants';
-import { redirect } from 'next/navigation';
+import { usePathname } from 'next/navigation';
 
 interface AuthRedirectWrapperPropsType extends PropsWithChildren {
   requireAuth?: boolean;
@@ -13,17 +13,17 @@ export const AuthRedirectWrapper = ({
   children,
   requireAuth = true
 }: AuthRedirectWrapperPropsType) => {
+  const router = useRouter();
+  const pathname = usePathname();
   const isLoggedIn = useGetIsLoggedIn();
 
   useEffect(() => {
-    if (isLoggedIn && !requireAuth) {
-      // No redirect needed
+    if (isLoggedIn && !requireAuth && pathname === '/unlock') {
+      router.push('/');
+    } else if (!isLoggedIn && requireAuth) {
+      router.push('/unlock');
     }
-
-    if (!isLoggedIn && requireAuth) {
-      redirect(RouteNamesEnum.unlock);
-    }
-  }, [isLoggedIn, requireAuth]);
+  }, [isLoggedIn, requireAuth, router, pathname]);
 
   return <>{children}</>;
 };
