@@ -11,7 +11,6 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
 } from "@/components/ui/dialog"
 import { Palette, Code, Rocket, CreditCard, Users, Image as ImageIcon, DollarSign } from 'lucide-react'
 

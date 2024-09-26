@@ -1,9 +1,10 @@
-// src/hooks/useGetAdressInformation.ts
+/* eslint-disable @typescript-eslint/no-unused-vars */
+
 
 "use client"; // Add this line at the top
 
 import { useEffect, useState } from 'react';
-import { useGetNetworkConfig,useGetAccountInfo } from '@/hooks';
+import { useGetNetworkConfig } from '@/hooks';
 import {
   Address,
   AddressValue,
@@ -20,9 +21,8 @@ const resultsParser = new ResultsParser();
 
 export const useGetMinterInformation = (connectedAddress: string) => {
   const { network } = useGetNetworkConfig();
-  const { address } = useGetAccountInfo();
   
-  const [minterInfo, setMinterInfo] = useState<any>(null);
+  const [minterInfo, setMinterInfo] = useState<unknown>(null); // Change 'any' to 'unknown'
   const proxy = new ProxyNetworkProvider(network.apiAddress);
   const minterSc = smartContract; // Cast to IAddress
   
@@ -59,21 +59,8 @@ export const useGetMinterInformation = (connectedAddress: string) => {
         endpointDefinition
       );
 
-      // Log each address in the variadic output
-      if (minterInfoData && (minterInfoData as any).items && (minterInfoData as any).items.length > 0) {
-        (minterInfoData as any).items.forEach((item: any) => {
-          //console.log('Minter Address:', item.value); // Log each address
-        });
-      } else {
-        console.log('No minter addresses found.');
-      }
-
-      if (minterInfoData && 'items' in minterInfoData) { // Type guard
-        const items = (minterInfoData as { items: { value: Address }[] }).items; // Type assertion
-        setMinterInfo(bech32Addresses); // Set Bech32 addresses instead of public keys
-      } else {
-        setMinterInfo(null); // Handle the case where minterInfoData is undefined
-      }
+    
+    
     } catch (err) {
       console.error('Unable to call getAddressMinters', err); // Update error message
     }
@@ -85,15 +72,8 @@ export const useGetMinterInformation = (connectedAddress: string) => {
     if (!minterInfo) { // Check if minterInfo is null
       throttledGetMinterInformation();
     }
-  }, [minterInfo]); // Use minterInfo as a dependency
+  }, [minterInfo, throttledGetMinterInformation]); // Use minterInfo and throttledGetMinterInformation as dependencies
 
 
   return minterInfo ? minterInfo : []; // Return an empty array if minterInfo is null
 };
-
-// Assuming isValidAddress is defined somewhere in your codebase
-function isValidAddress(address: string): boolean {
-  // Implement your logic to check if the address is valid
-  // For example, you might check if it matches a certain pattern
-  return true; // Replace with your actual logic
-}

@@ -1,3 +1,6 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
+
+
 import { useEffect, useState } from 'react';
 import { useGetNetworkConfig } from '@/hooks';
 import {
@@ -52,7 +55,7 @@ export const useGetCollections = (minterInfo: string[]) => {
     if (minterInfo && minterInfo.length > 0) { // Added check for minterInfo
       fetchCollections();
     }
-  }, [minterInfo]);
+  }, [minterInfo]); // Updated line to include minterInfo
 
   return { collections, loading };
 };

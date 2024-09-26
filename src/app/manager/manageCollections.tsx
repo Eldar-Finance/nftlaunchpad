@@ -9,7 +9,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 import { Label } from "@/components/ui/label"
-import { Info, Pause, Play, Trash2, DollarSign, Lock, Unlock } from 'lucide-react'
+import { Pause, Trash2, DollarSign, Lock } from 'lucide-react'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
 import { useGetMinterInformation } from '@/hooks/useGetAddressInformation' 
 import { useGetCollections } from '@/hooks/useGetCollections' 
@@ -26,11 +26,14 @@ interface CollectionDetails {
 }
 
 export default function ManageCollections() {
-const { address: connectedAddress } = useGetAccountInfo(); 
-console.log('Connected Address:', connectedAddress);
-  const  addressInformation  = useGetMinterInformation(connectedAddress)
+  const { address: connectedAddress } = useGetAccountInfo(); 
+  console.log('Connected Address:', connectedAddress);
+  const addressInformation = useGetMinterInformation(connectedAddress);
   console.log('Address Information:', addressInformation);
-  const { collections, loading } = useGetCollections(addressInformation)
+
+  // Ensure addressInformation is an array before passing it
+  const { collections, loading } = useGetCollections(Array.isArray(addressInformation) ? addressInformation : []); // Updated line
+
   console.log('Collections:', collections);
 
   const [selectedCollection, setSelectedCollection] = useState('')
@@ -97,7 +100,7 @@ console.log('Connected Address:', connectedAddress);
                     </div>
                     <div>
                       <Label className="text-sm font-medium text-gray-400">Address</Label>
-                      <p className="text-white">{collectionDetails.address ?? 'N/A'}</p> // Use optional chaining
+                      <p className="text-white">{collectionDetails.address ?? 'N/A'}</p> 
                     </div>
                     {/* Add more details as available from your API */}
                   </div>

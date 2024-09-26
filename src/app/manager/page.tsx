@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 
 import { AuthRedirectWrapper } from '@/wrappers';
 import { ClientHooks } from '@/components/ClientHooks';

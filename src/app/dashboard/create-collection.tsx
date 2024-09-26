@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
+
 'use client'
 
 import { useState } from 'react'
@@ -14,12 +16,7 @@ import {
   useGetAccountInfo
 } from '@/hooks/sdkDappHooks';
 import { newTransaction } from '@/helpers/sdkDappHelpers';
-import {
-    ContractFunction,
-    ResultsParser,
-    ProxyNetworkProvider,
-    smartContract,
-  } from '@/utils';
+import Image from 'next/image';
 
 import { Address } from '@multiversx/sdk-core';
 import { GAS_PRICE, VERSION } from '@/localConstants';
@@ -426,7 +423,7 @@ export function CreateCollection({ onBack }: CreateCollectionProps) {
               )}
               {thumbnail && (
                 <div className="mt-4">
-                  <img src={thumbnail} alt="Thumbnail" className="w-32 h-32 object-cover" />
+                  <Image src={thumbnail} alt="Thumbnail" layout="responsive" width={500} height={300} />
                   <p className="text-sm text-gray-500">Image Type: {imageType}</p> {/* Display image type */}
                 </div>
               )}

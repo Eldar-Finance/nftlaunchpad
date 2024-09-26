@@ -1,6 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
-
-
 'use client'
 
 import { useState } from 'react'
@@ -30,8 +27,7 @@ export function CreateMinter({ onBack }: CreateMinterProps) {
   const nonce = account.nonce;
   const minterInfo = useGetMinterInformation(connectedAddress);
   //console.log('Minter Information (Bech32):', minterInfo);
-  const { collections, loading } = useGetCollections(minterInfo);
-  //console.log('Collections:', collections);
+  const { collections } = useGetCollections(Array.isArray(minterInfo) ? minterInfo : []);
 
   const [selectedCollection, setSelectedCollection] = useState('')
 
@@ -53,7 +49,7 @@ export function CreateMinter({ onBack }: CreateMinterProps) {
         value: valueSend,
         data: hexArguments,
         receiver: selectedCollectionAddress, // Use selectedCollection.address here
-        gasLimit: 70000000,
+        gasLimit: 80000000,
         gasPrice: GAS_PRICE,
         chainID: network.chainId,
         nonce: nonce,
