@@ -26,7 +26,7 @@ export function CreateMinter({ onBack }: CreateMinterProps) {
   const { account } = useGetAccountInfo();
   const nonce = account.nonce;
   const minterInfo = useGetMinterInformation(connectedAddress);
-  //console.log('Minter Information (Bech32):', minterInfo);
+  console.log('Minter Information (Bech32):', minterInfo);
   const { collections } = useGetCollections(Array.isArray(minterInfo) ? minterInfo : []);
 
   const [selectedCollection, setSelectedCollection] = useState('')
@@ -106,8 +106,8 @@ export function CreateMinter({ onBack }: CreateMinterProps) {
               </SelectTrigger>
               <SelectContent className="bg-gray-800 border-gray-700 text-white">
                 {collections.map((collection) => (
-                  <SelectItem key={collection.name} value={collection.name}>
-                    {collection.name}
+                  <SelectItem key={collection.name} value={collection.name || 'default-value'}>
+                    {collection.name || 'Unnamed Collection'}
                   </SelectItem>
                 ))}
               </SelectContent>

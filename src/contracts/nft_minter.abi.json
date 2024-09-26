@@ -13,7 +13,7 @@
         },
         "framework": {
             "name": "multiversx-sc",
-            "version": "0.52.3"
+            "version": "0.53.0"
         }
     },
     "name": "NftMinter",
@@ -24,7 +24,11 @@
                 "type": "Address"
             },
             {
-                "name": "name",
+                "name": "collection_name",
+                "type": "bytes"
+            },
+            {
+                "name": "single_nft_name",
                 "type": "bytes"
             },
             {
@@ -54,6 +58,10 @@
             {
                 "name": "has_json_metadata",
                 "type": "bool"
+            },
+            {
+                "name": "tags",
+                "type": "bytes"
             },
             {
                 "name": "costs",
@@ -88,9 +96,18 @@
                 }
             ]
         },
-
         {
-            "name": "getName",
+            "name": "getCollectionName",
+            "mutability": "readonly",
+            "inputs": [],
+            "outputs": [
+                {
+                    "type": "bytes"
+                }
+            ]
+        },
+        {
+            "name": "getSingleNftName",
             "mutability": "readonly",
             "inputs": [],
             "outputs": [
@@ -170,6 +187,16 @@
             ]
         },
         {
+            "name": "getTags",
+            "mutability": "readonly",
+            "inputs": [],
+            "outputs": [
+                {
+                    "type": "bytes"
+                }
+            ]
+        },
+        {
             "name": "getCostTokens",
             "mutability": "readonly",
             "inputs": [],
@@ -206,22 +233,12 @@
             ]
         },
         {
-            "name": "getTotalMinted",
+            "name": "getIpfsIndices",
             "mutability": "readonly",
             "inputs": [],
             "outputs": [
                 {
-                    "type": "u64"
-                }
-            ]
-        },
-        {
-            "name": "getMintedIndices",
-            "mutability": "readonly",
-            "inputs": [],
-            "outputs": [
-                {
-                    "type": "variadic<u64>",
+                    "type": "variadic<u32>",
                     "multi_result": true
                 }
             ]
@@ -301,12 +318,6 @@
             ]
         },
         {
-            "docs": [
-                "I still need:",
-                "",
-                "- tags",
-                "- single NFT name"
-            ],
             "name": "mint",
             "mutability": "mutable",
             "payableInTokens": [
@@ -324,9 +335,139 @@
                     "multi_result": true
                 }
             ]
+        },
+        {
+            "name": "getTotalMinted",
+            "mutability": "readonly",
+            "inputs": [],
+            "outputs": [
+                {
+                    "type": "u64"
+                }
+            ]
+        },
+        {
+            "docs": [
+                "#### Returns all the information about the Minter:",
+                "",
+                "- Creator Address",
+                "- Collection Identifier",
+                "- List of Strings:",
+                "    - Collection Name",
+                "    - Single NFT Name",
+                "    - Ticker",
+                "    - Description",
+                "    - IPFS CID",
+                "    - File Ending (png, jpg, etc.)",
+                "    - Tags",
+                "- List of Numbers:",
+                "    - Royalties",
+                "    - Max Supply",
+                "    - Max Amount Per Mint",
+                "    - Total NFTs Minted",
+                "- List of Booleans:",
+                "    - Has JSON Metadata",
+                "    - Is Minting Enabled (by Creator)",
+                "    - Is Paused (by Protocol)",
+                "- List of Lists about the mint costs:",
+                "    - Cost Token Identifier",
+                "    - Cost Amount"
+            ],
+            "name": "getMinterInfo",
+            "mutability": "readonly",
+            "inputs": [],
+            "outputs": [
+                {
+                    "type": "Address"
+                },
+                {
+                    "type": "TokenIdentifier"
+                },
+                {
+                    "type": "variadic<bytes>",
+                    "multi_result": true
+                },
+                {
+                    "type": "variadic<u64>",
+                    "multi_result": true
+                },
+                {
+                    "type": "variadic<bool>",
+                    "multi_result": true
+                },
+                {
+                    "type": "variadic<multi<EgldOrEsdtTokenIdentifier,BigUint>>",
+                    "multi_result": true
+                }
+            ]
+        }
+    ],
+    "events": [
+        {
+            "identifier": "select_ipfs_index",
+            "inputs": [
+                {
+                    "name": "available_indices",
+                    "type": "u32",
+                    "indexed": true
+                },
+                {
+                    "name": "selected_index",
+                    "type": "u32",
+                    "indexed": true
+                },
+                {
+                    "name": "ipfs_index",
+                    "type": "u32",
+                    "indexed": true
+                }
+            ]
+        },
+        {
+            "identifier": "mint",
+            "inputs": [
+                {
+                    "name": "caller",
+                    "type": "Address",
+                    "indexed": true
+                },
+                {
+                    "name": "payment",
+                    "type": "EgldOrEsdtTokenPayment",
+                    "indexed": true
+                },
+                {
+                    "name": "collection_identifier",
+                    "type": "TokenIdentifier",
+                    "indexed": true
+                },
+                {
+                    "name": "minted_nonces",
+                    "type": "variadic<u64>",
+                    "indexed": true
+                }
+            ]
         }
     ],
     "esdtAttributes": [],
     "hasCallback": true,
-    "types": {}
+    "types": {
+        "EgldOrEsdtTokenPayment": {
+            "type": "struct",
+            "fields": [
+                {
+                    "name": "token_identifier",
+                    "type": "EgldOrEsdtTokenIdentifier"
+                },
+                {
+                    "name": "token_nonce",
+                    "type": "u64"
+                },
+                {
+                    "name": "amount",
+                    "type": "BigUint"
+                }
+            ]
+        }
+    }
 }

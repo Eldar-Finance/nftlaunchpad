@@ -9,7 +9,11 @@ const nextConfig = {
     });
 
     return config;
-  }
+  },
+  reactStrictMode: true,
+  images: {
+    domains: ['ipfs.io'],
+  },
 };
 
 module.exports = nextConfig;

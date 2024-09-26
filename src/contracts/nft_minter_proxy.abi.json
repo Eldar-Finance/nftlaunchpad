@@ -138,7 +138,11 @@
             "mutability": "mutable",
             "inputs": [
                 {
-                    "name": "name",
+                    "name": "collection_name",
+                    "type": "bytes"
+                },
+                {
+                    "name": "single_nft_name",
                     "type": "bytes"
                 },
                 {
@@ -168,6 +172,10 @@
                 {
                     "name": "has_json_metadata",
                     "type": "bool"
+                },
+                {
+                    "name": "tags",
+                    "type": "bytes"
                 },
                 {
                     "name": "costs",

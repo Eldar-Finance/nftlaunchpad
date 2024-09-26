@@ -45,13 +45,15 @@ interface CreateCollectionProps {
 
 export function CreateCollection({ onBack }: CreateCollectionProps) {
   const [formData, setFormData] = useState({
-    collectionName: '', // Renamed from 'name' to 'collectionName'
+    collectionName: '',
+    nftName: '', // New field for NFT Name
     ticker: '',
     description: '',
     royalties: '',
     maxSupply: '',
     paymentTokens: [{ identifier: '', amount: '' }],
-    ipfsCid: ''
+    ipfsCid: '',
+    tags: '' // New field for Tags
   })
   
   const { network } = useGetNetworkConfig();
@@ -190,23 +192,25 @@ export function CreateCollection({ onBack }: CreateCollectionProps) {
   const handleCreateCollection = async () => {
     const costs = formData.paymentTokens.map(token => {
         const identifierHex = stringToHex(token.identifier);
-        const amountInHex = (parseFloat(token.amount) * 1e18).toString(16); // Convert amount to hex
-        const amountHex = ensureEvenHex(amountInHex); // Ensure even hex for amount
-        return `${identifierHex}@${amountHex}`; // Combine without additional ensureEvenHex
+        const amountInHex = (parseFloat(token.amount) * 1e18).toString(16);
+        const amountHex = ensureEvenHex(amountInHex);
+        return `${identifierHex}@${amountHex}`;
     });
 
     // Ensure all other hex values are also even
-    const name = ensureEvenHex(stringToHex(formData.collectionName)); // Convert to hex
-    const ticker = ensureEvenHex(stringToHex(formData.ticker)); // Convert to hex
-    const description = ensureEvenHex(stringToHex(formData.description)); // Convert to hex
-    const royalties = ensureEvenHex((parseFloat(formData.royalties) * 100).toString(16)); // Convert to hex and ensure even
-    const maxSupply = ensureEvenHex((parseInt(formData.maxSupply)).toString(16)); // Convert to hex and ensure even
-    const ipfsCid = ensureEvenHex(stringToHex(formData.ipfsCid)); // Convert to hex
-    const fileEnding = ensureEvenHex(stringToHex(imageType.toLowerCase())); // Convert to hex and ensure even, with lowercase
-    const hasJsonMetadata = ensureEvenHex('1'); // Ensure even hex for boolean (1 for true)
+    const name = ensureEvenHex(stringToHex(formData.collectionName));
+    const nftName = ensureEvenHex(stringToHex(formData.nftName)); // New: NFT Name
+    const ticker = ensureEvenHex(stringToHex(formData.ticker));
+    const description = ensureEvenHex(stringToHex(formData.description));
+    const royalties = ensureEvenHex((parseFloat(formData.royalties) * 100).toString(16));
+    const maxSupply = ensureEvenHex((parseInt(formData.maxSupply)).toString(16));
+    const ipfsCid = ensureEvenHex(stringToHex(formData.ipfsCid));
+    const fileEnding = ensureEvenHex(stringToHex(imageType.toLowerCase()));
+    const hasJsonMetadata = ensureEvenHex('1');
+    const tags = ensureEvenHex(stringToHex(formData.tags)); // New: Tags
 
     // Construct hexArguments
-    const hexArguments = `createCollectionMinter@${name}@${ticker}@${description}@${royalties}@${maxSupply}@${ipfsCid}@${fileEnding}@${hasJsonMetadata}@${costs.join('@')}`;
+    const hexArguments = `createCollectionMinter@${name}@${nftName}@${ticker}@${description}@${royalties}@${maxSupply}@${ipfsCid}@${fileEnding}@${hasJsonMetadata}@${tags}@${costs.join('@')}`;
 
     const createCollectionTransaction = newTransaction({
         value: 0,
@@ -249,33 +253,61 @@ export function CreateCollection({ onBack }: CreateCollectionProps) {
       <CardContent>
         <form onSubmit={handleSubmit} className="space-y-6">
           <div className="space-y-4">
-            <div>
-              <Label htmlFor="collectionName" className="flex items-center text-sm font-medium text-gray-300">
-                <Palette className="w-4 h-4 mr-2 text-blue-400" />
-                Collection Name
-                <TooltipProvider delayDuration={100}>
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <Info className="w-4 h-4 ml-2 cursor-help text-gray-500" />
-                    </TooltipTrigger>
-                    <TooltipContent side="right" className="bg-gray-800 text-white p-2 rounded-md text-xs">
-                      <p>Only letters, either lowercase or uppercase, without spaces. Maximum of 50 characters.</p>
-                    </TooltipContent>
-                  </Tooltip>
-                </TooltipProvider>
-              </Label>
-              <Input
-                id="collectionName" // Updated ID
-                name="collectionName" // Updated name attribute
-                value={formData.collectionName} // Updated value binding
-                onChange={handleInputChange}
-                required
-                maxLength={50}
-                pattern="[a-zA-Z]+" // This allows only letters
-                title="Only letters, either lowercase or uppercase, without spaces. Maximum of 50 characters."
-                className="mt-1 bg-gray-800 border-gray-700 text-white placeholder-gray-500 focus:ring-blue-500 focus:border-blue-500"
-                placeholder="e.g., CryptoArtCollection"
-              />
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <Label htmlFor="collectionName" className="flex items-center text-sm font-medium text-gray-300">
+                  <Palette className="w-4 h-4 mr-2 text-blue-400" />
+                  Collection Name
+                  <TooltipProvider delayDuration={100}>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <Info className="w-4 h-4 ml-2 cursor-help text-gray-500" />
+                      </TooltipTrigger>
+                      <TooltipContent side="right" className="bg-gray-800 text-white p-2 rounded-md text-xs">
+                        <p>Only letters, either lowercase or uppercase, without spaces. Maximum of 50 characters.</p>
+                      </TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
+                </Label>
+                <Input
+                  id="collectionName"
+                  name="collectionName"
+                  value={formData.collectionName}
+                  onChange={handleInputChange}
+                  required
+                  maxLength={50}
+                  pattern="[a-zA-Z]+"
+                  title="Only letters, either lowercase or uppercase, without spaces. Maximum of 50 characters."
+                  className="mt-1 bg-gray-800 border-gray-700 text-white placeholder-gray-500 focus:ring-blue-500 focus:border-blue-500"
+                  placeholder="e.g., CryptoArtCollection"
+                />
+              </div>
+              <div>
+                <Label htmlFor="nftName" className="flex items-center text-sm font-medium text-gray-300">
+                  <Tag className="w-4 h-4 mr-2 text-green-400" />
+                  NFT Name
+                  <TooltipProvider delayDuration={100}>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <Info className="w-4 h-4 ml-2 cursor-help text-gray-500" />
+                      </TooltipTrigger>
+                      <TooltipContent side="right" className="bg-gray-800 text-white p-2 rounded-md text-xs">
+                        <p>Letters, spaces, and symbols allowed. Maximum of 50 characters.</p>
+                      </TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
+                </Label>
+                <Input
+                  id="nftName"
+                  name="nftName"
+                  value={formData.nftName}
+                  onChange={handleInputChange}
+                  required
+                  maxLength={50}
+                  className="mt-1 bg-gray-800 border-gray-700 text-white placeholder-gray-500 focus:ring-green-500 focus:border-green-500"
+                  placeholder="e.g., Crypto Art #"
+                />
+              </div>
             </div>
             <div>
               <Label htmlFor="ticker" className="flex items-center text-sm font-medium text-gray-300">
@@ -470,6 +502,30 @@ export function CreateCollection({ onBack }: CreateCollectionProps) {
               <Button onClick={addPaymentToken} variant="outline" className="mt-2 text-blue-400 border-blue-400 hover:bg-blue-400 hover:text-gray-900">
                 <Plus className="w-4 h-4 mr-2" /> Add Token
               </Button>
+            </div>
+            <div>
+              <Label htmlFor="tags" className="flex items-center text-sm font-medium text-gray-300">
+                <Tag className="w-4 h-4 mr-2 text-orange-400" />
+                Tags
+                <TooltipProvider delayDuration={100}>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Info className="w-4 h-4 ml-2 cursor-help text-gray-500" />
+                    </TooltipTrigger>
+                    <TooltipContent side="right" className="bg-gray-800 text-white p-2 rounded-md text-xs">
+                      <p>Up to 5 tags separated by semicolons (;)</p>
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
+              </Label>
+              <Input
+                id="tags"
+                name="tags"
+                value={formData.tags}
+                onChange={handleInputChange}
+                className="mt-1 bg-gray-800 border-gray-700 text-white placeholder-gray-500 focus:ring-orange-500 focus:border-orange-500"
+                placeholder="e.g., art;crypto;collectible;rare;unique"
+              />
             </div>
           </div>
           <div className="flex justify-between pt-6">
