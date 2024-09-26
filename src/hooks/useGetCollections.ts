@@ -1,10 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useGetNetworkConfig } from '@/hooks';
 import {
-    Address,
-    AddressValue,
-    ContractFunction,
-    ResultsParser,
     ProxyNetworkProvider,
     notproxy, // Ensure the class name is capitalized
   } from '@/utils';
@@ -33,10 +29,6 @@ export const useGetCollections = (minterInfo: string[]) => {
           const identifierResponse = await proxy.queryContract(identifierQuery);
           const encodedidentifier = identifierResponse.returnData[0];
           const decodedIdentifier = atob(encodedidentifier)
-          //console.log('Identifier', identifierResponse.returnData) // Adjust based on your response structure
-          //console.log('Identifier:', identifier);
-          //console.log('Identifier Response:', identifierResponse);
-          //console.log('Identifier:', identifier);
 
           // Query for collection name
           const nameQuery = contract.createQuery({
