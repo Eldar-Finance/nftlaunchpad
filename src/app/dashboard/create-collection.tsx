@@ -68,9 +68,20 @@ export function CreateCollection({ onBack }: CreateCollectionProps) {
   const [ipfsObjectCount, setIpfsObjectCount] = useState(0);
   const [thumbnail, setThumbnail] = useState<string | null>(null);
   const [imageType, setImageType] = useState(''); // State for image type
+  const [royaltiesError, setRoyaltiesError] = useState('');
 
   const handleInputChange = async (e: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>) => {
     const { name, value } = e.target
+
+    if (name === 'royalties') {
+      const royaltiesValue = parseFloat(value);
+      if (isNaN(royaltiesValue) || royaltiesValue < 0 || royaltiesValue > 100 || !(/^\d{1,3}(\.\d{0,2})?$/.test(value))) {
+        setRoyaltiesError('Royalties must be a number between 0 and 100 with up to 2 decimal places.');
+      } else {
+        setRoyaltiesError('');
+      }
+    }
+
     setFormData(prev => ({ ...prev, [name]: value }))
 
     if (name === 'ipfsCid') {
@@ -185,11 +196,19 @@ export function CreateCollection({ onBack }: CreateCollectionProps) {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
+    if (royaltiesError) {
+      console.error('Invalid royalties value');
+      return;
+    }
     console.log('Collection created:', formData)
     // Here you would typically send the data to your backend
   }
 
   const handleCreateCollection = async () => {
+    if (royaltiesError) {
+      console.error('Invalid royalties value');
+      return;
+    }
     const costs = formData.paymentTokens.map(token => {
         const identifierHex = stringToHex(token.identifier);
         const amountInHex = (parseFloat(token.amount) * 1e18).toString(16);
@@ -372,7 +391,7 @@ export function CreateCollection({ onBack }: CreateCollectionProps) {
                         <Info className="w-4 h-4 ml-2 cursor-help text-gray-500" />
                       </TooltipTrigger>
                       <TooltipContent side="right" className="bg-gray-800 text-white p-2 rounded-md text-xs">
-                        <p>A number between 0 and 100 with up to 2 decimal points.</p>
+                        <p>A number between 0 and 100 with up to 2 decimal places.</p>
                       </TooltipContent>
                     </Tooltip>
                   </TooltipProvider>
@@ -380,16 +399,14 @@ export function CreateCollection({ onBack }: CreateCollectionProps) {
                 <Input
                   id="royalties"
                   name="royalties"
-                  type="number"
+                  type="text"
                   value={formData.royalties}
                   onChange={handleInputChange}
                   required
-                  min="0"
-                  max="100"
-                  step="0.01"
                   className="mt-1 bg-gray-800 border-gray-700 text-white placeholder-gray-500 focus:ring-yellow-500 focus:border-yellow-500"
                   placeholder="e.g., 2.5"
                 />
+                {royaltiesError && <p className="text-red-500 text-xs mt-1">{royaltiesError}</p>}
               </div>
               <div>
                 <Label htmlFor="maxSupply" className="flex items-center text-sm font-medium text-gray-300">
@@ -513,7 +530,7 @@ export function CreateCollection({ onBack }: CreateCollectionProps) {
                       <Info className="w-4 h-4 ml-2 cursor-help text-gray-500" />
                     </TooltipTrigger>
                     <TooltipContent side="right" className="bg-gray-800 text-white p-2 rounded-md text-xs">
-                      <p>Up to 5 tags separated by semicolons (;)</p>
+                      <p>Up to 5 tags separated by commas (,)</p>
                     </TooltipContent>
                   </Tooltip>
                 </TooltipProvider>
@@ -524,7 +541,7 @@ export function CreateCollection({ onBack }: CreateCollectionProps) {
                 value={formData.tags}
                 onChange={handleInputChange}
                 className="mt-1 bg-gray-800 border-gray-700 text-white placeholder-gray-500 focus:ring-orange-500 focus:border-orange-500"
-                placeholder="e.g., art;crypto;collectible;rare;unique"
+                placeholder="e.g., art,crypto,collectible,rare,unique"
               />
             </div>
           </div>
