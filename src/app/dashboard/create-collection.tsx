@@ -21,6 +21,16 @@ import Image from 'next/image';
 import { Address } from '@multiversx/sdk-core';
 import { GAS_PRICE, VERSION } from '@/localConstants';
 
+interface Attribute {
+  trait_type: string;
+  value: string;
+}
+
+interface Metadata {
+  attributes: Attribute[];
+  // Add other properties if needed
+}
+
 const validateIpfsCid = async (cid: string) => {
   try {
     console.log(`Validating CID: ${cid}`);
@@ -70,7 +80,7 @@ export function CreateCollection({ onBack }: CreateCollectionProps) {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [imageType, setImageType] = useState(''); // State for image type
   const [royaltiesError, setRoyaltiesError] = useState('');
-  const [metadataList, setMetadataList] = useState<any[]>([]);
+  const [metadataList, setMetadataList] = useState<Metadata[]>([]);
   const [isLoading, setIsLoading] = useState(false);
 
   const handleInputChange = async (e: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>) => {
@@ -106,7 +116,7 @@ export function CreateCollection({ onBack }: CreateCollectionProps) {
     try {
       const imageNumbers = [2, 5, 10];
       const imageUrls: string[] = [];
-      const metadataList: any[] = [];
+      const metadataList: Metadata[] = [];
 
       for (const number of imageNumbers) {
         const pngUrl = `https://ipfs.io/ipfs/${cid}/${number}.png`;
@@ -519,7 +529,7 @@ export function CreateCollection({ onBack }: CreateCollectionProps) {
                       <div className="w-1/2 p-2 overflow-y-auto max-h-64">
                         <h3 className="text-sm font-semibold text-white mb-1">Attributes</h3>
                         <div className="grid grid-cols-2 gap-1">
-                          {metadataList[currentImageIndex]?.attributes.map((attr: any, attrIndex: number) => (
+                          {metadataList[currentImageIndex]?.attributes.map((attr: Attribute, attrIndex: number) => (
                             <div key={attrIndex} className="bg-gray-700 rounded p-1 text-xs">
                               <p className="font-medium text-gray-300 truncate" title={attr.trait_type}>{attr.trait_type}</p>
                               <p className="text-white break-words">{attr.value}</p>
