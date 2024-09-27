@@ -6,7 +6,6 @@ import { ClientHooks } from '@/components/ClientHooks';
 import ManageCollections from './manageCollections';
 import { useGetCollections } from '@/hooks/useGetCollections'; 
 import { useGetMinterInformation } from '@/hooks/useGetAddressInformation'; 
-import { useGetNetworkConfig } from '@/hooks/sdkDappHooks';
 import { useGetAccountInfo } from '@/hooks';
 import { Grid, ChevronRight } from 'lucide-react';
 
