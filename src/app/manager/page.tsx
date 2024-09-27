@@ -12,9 +12,7 @@ import { Grid, ChevronRight } from 'lucide-react';
 
 export default function Manager() {
   const [selectedCollection, setSelectedCollection] = useState<string | null>(null);
-  const { network } = useGetNetworkConfig();
   const { address: connectedAddress } = useGetAccountInfo();
-  const { account } = useGetAccountInfo();
 
   const minterInfo = useGetMinterInformation(connectedAddress);
   const { collections } = useGetCollections(Array.isArray(minterInfo) ? minterInfo : []);
