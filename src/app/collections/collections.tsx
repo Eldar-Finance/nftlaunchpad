@@ -73,13 +73,7 @@ interface CollectionsProps {
 
 export default function Collections({ onCollectionSelect }: CollectionsProps) {
   const [hoveredCard, setHoveredCard] = useState<string | null>(null)
-  const [scrollY, setScrollY] = useState(0)
 
-  useEffect(() => {
-    const handleScroll = () => setScrollY(window.scrollY)
-    window.addEventListener('scroll', handleScroll)
-    return () => window.removeEventListener('scroll', handleScroll)
-  }, [])
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-950 to-gray-900 text-gray-200 p-8">
