@@ -58,8 +58,8 @@ export default function CollectionManager({ collectionAddress }: { collectionAdd
             />
             <InfoCard
               icon={<LayoutGrid className="w-5 h-5 text-blue-400" />}
-              label="Supply"
-              value={`${info.totalNftsMinted} / ${info.maxSupply}`}
+              label="Minted / Total Supply"
+              value={`${info.totalNftsMinted || '-'} / ${info.maxSupply || '-'}`}
             />
             <InfoCard
               icon={<Users className="w-5 h-5 text-yellow-400" />}
@@ -125,21 +125,11 @@ export default function CollectionManager({ collectionAddress }: { collectionAdd
               <CardTitle className="text-xl font-semibold text-white">Collection Status</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <StatusItem
-                  label="JSON Metadata"
-                  value={info.hasJsonMetadata}
-                  icon={info.hasJsonMetadata ? <CheckCircle className="w-5 h-5 text-green-400" /> : <XCircle className="w-5 h-5 text-red-400" />}
-                />
+              <div className="grid grid-cols-1 gap-4">
                 <StatusItem
                   label="Minting Enabled"
                   value={info.isMintingEnabled}
                   icon={info.isMintingEnabled ? <CheckCircle className="w-5 h-5 text-green-400" /> : <XCircle className="w-5 h-5 text-red-400" />}
-                />
-                <StatusItem
-                  label="Paused"
-                  value={info.isPaused}
-                  icon={info.isPaused ? <CheckCircle className="w-5 h-5 text-red-400" /> : <XCircle className="w-5 h-5 text-green-400" />}
                 />
               </div>
             </CardContent>
@@ -147,16 +137,10 @@ export default function CollectionManager({ collectionAddress }: { collectionAdd
 
           <div className="flex flex-wrap justify-center gap-4 mt-8">
             <ActionButton
-              icon={info.isPaused ? <Play className="w-4 h-4" /> : <Pause className="w-4 h-4" />}
-              label={info.isPaused ? "Resume" : "Pause"}
-              onClick={() => handleAction(info.isPaused ? 'resume' : 'pause')}
-              tooltipText={info.isPaused ? "Resume the collection" : "Pause the collection"}
-            />
-            <ActionButton
-              icon={info.isMintingEnabled ? <Lock className="w-4 h-4" /> : <Unlock className="w-4 h-4" />}
-              label={info.isMintingEnabled ? "Disable Minting" : "Enable Minting"}
-              onClick={() => handleAction(info.isMintingEnabled ? 'disableMinting' : 'enableMinting')}
-              tooltipText={info.isMintingEnabled ? "Disable minting for this collection" : "Enable minting for this collection"}
+              icon={info.isMintingEnabled ? <Pause className="w-4 h-4" /> : <Play className="w-4 h-4" />}
+              label={info.isMintingEnabled ? "Pause Minting" : "Enable Minting"}
+              onClick={() => handleAction(info.isMintingEnabled ? 'pauseMinting' : 'enableMinting')}
+              tooltipText={info.isMintingEnabled ? "Pause minting for this collection" : "Enable minting for this collection"}
             />
             <ActionButton
               icon={<DollarSign className="w-4 h-4" />}
