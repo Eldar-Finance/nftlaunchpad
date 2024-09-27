@@ -23,18 +23,6 @@ const float = {
   }
 }
 
-const glow = {
-  boxShadow: [
-    "0 0 5px #4FD1C5",
-    "0 0 20px #4FD1C5, 0 0 30px #4FD1C5",
-    "0 0 5px #4FD1C5"
-  ],
-  transition: {
-    duration: 2,
-    repeat: Infinity,
-    ease: "easeInOut"
-  }
-}
 
 const features = [
   { title: 'Create Collections', description: 'Launch your unique NFT collections with ease', icon: Palette },
@@ -53,7 +41,7 @@ export default function LandingPage() {
         <div className="flex flex-col md:flex-row items-center justify-between mb-20">
           <div className="max-w-2xl">
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold mb-6 bg-gradient-to-r from-cyan-400 to-pink-600 bg-clip-text text-transparent">
-              Qx NFT Launchpad
+              QuantumX Launchpad
             </h1>
             <p className="text-xl text-gray-300 mb-8">
               Empower your creativity with our cutting-edge NFT creation and management platform.
@@ -73,7 +61,7 @@ export default function LandingPage() {
               animate={float}
             >
               <Image
-                src=""
+                src="https://media.xoxno.com/nftmedia/QXHR-9b0bc6/QXHR-9b0bc6-01a6.avif"
                 alt="NFT Showcase"
                 width={500}
                 height={500}
@@ -90,7 +78,6 @@ export default function LandingPage() {
                   width: `${Math.random() * 50 + 20}px`,
                   height: `${Math.random() * 50 + 20}px`,
                 }}
-                animate={glow}
               />
             ))}
           </div>
