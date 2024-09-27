@@ -88,7 +88,7 @@ export default function LandingPage() {
           <h2 className="text-4xl font-bold text-center mb-12 text-white">Unleash Your NFT Potential</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             {features.map((feature, index) => (
-              <Card key={index} className="bg-gray-800 bg-opacity-50 backdrop-blur-lg border-gray-700 hover:shadow-lg transition-all duration-300">
+              <Card key={index} className="bg-gray-500 bg-opacity-10 backdrop-blur-lg border-gray-700 hover:shadow-lg transition-all duration-300">
                 <CardHeader>
                   <CardTitle className="text-2xl font-bold text-cyan-400 flex items-center">
                     <feature.icon className="w-6 h-6 mr-2" />
@@ -104,7 +104,7 @@ export default function LandingPage() {
         </div>
 
         {/* Stats Section */}
-        <Card className="bg-gray-800 bg-opacity-50 backdrop-blur-lg border-gray-700 mb-20">
+        <Card className="bg-gray-600 bg-opacity-10 backdrop-blur-lg border-gray-700 mb-20">
           <CardHeader>
             <CardTitle className="text-3xl font-bold text-center text-white">Platform Statistics</CardTitle>
           </CardHeader>

@@ -11,7 +11,7 @@ import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { getWindowLocation } from '@/utils/sdkDappUtils';
 import { usePathname } from 'next/navigation';
-import { Power, LogIn, Home, LayoutDashboard, Settings } from 'lucide-react';
+import { Power, LogIn, Home, LayoutDashboard, Settings,DollarSign } from 'lucide-react';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 
 export const Header = () => {
@@ -44,6 +44,7 @@ export const Header = () => {
     { icon: Home, label: 'Home', route: RouteNamesEnum.home },
     { icon: LayoutDashboard, label: 'Dashboard', route: RouteNamesEnum.dashboard },
     { icon: Settings, label: 'Manager', route: RouteNamesEnum.manager },
+    { icon: DollarSign, label: 'Collections', route: RouteNamesEnum.collections },
   ];
 
   return (
