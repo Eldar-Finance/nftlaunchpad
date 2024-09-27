@@ -94,7 +94,7 @@ export default function CollectionManager({ collectionAddress }: { collectionAdd
               </CardHeader>
               <CardContent>
                 <div className="flex flex-wrap gap-2">
-                  {info.tags.split(';').map((tag, index) => (
+                  {info.tags.split(',').map((tag, index) => (
                     <span key={index} className="px-2 py-1 bg-gray-700 rounded-full text-sm text-gray-300">
                       {tag.trim()}
                     </span>
