@@ -2,8 +2,8 @@
 
 'use client'
 
-import { useState } from 'react'
-import { ArrowLeft, Info, Tag, Palette, Coins, CreditCard, LayoutGrid, Plus, Trash2, CheckCircle, XCircle } from "lucide-react"
+import { useState, useEffect } from 'react'
+import { ArrowLeft, Info, Tag, Palette, Coins, CreditCard, LayoutGrid, Plus, Trash2, CheckCircle, XCircle, ChevronLeft, ChevronRight } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Textarea } from "@/components/ui/textarea"
 import { Input } from "@/components/ui/input"
@@ -66,7 +66,8 @@ export function CreateCollection({ onBack }: CreateCollectionProps) {
   const [imageCount, setImageCount] = useState(0);
   const [jsonCount, setJsonCount] = useState(0);
   const [ipfsObjectCount, setIpfsObjectCount] = useState(0);
-  const [thumbnail, setThumbnail] = useState<string | null>(null);
+  const [thumbnails, setThumbnails] = useState<string[]>([]);
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [imageType, setImageType] = useState(''); // State for image type
   const [royaltiesError, setRoyaltiesError] = useState('');
 
@@ -100,30 +101,31 @@ export function CreateCollection({ onBack }: CreateCollectionProps) {
 
   const fetchIpfsData = async (cid: string) => {
     try {
-      const imageUrls = [
-        `https://ipfs.io/ipfs/${cid}/2.png`,
-        `https://ipfs.io/ipfs/${cid}/2.jpg`
-      ];
-      let thumbnailUrl = '';
-      let imageType = '';
+      const imageNumbers = [2, 5, 10];
+      const imageUrls: string[] = [];
 
-      for (const url of imageUrls) {
+      for (const number of imageNumbers) {
+        const pngUrl = `https://ipfs.io/ipfs/${cid}/${number}.png`;
+        const jpgUrl = `https://ipfs.io/ipfs/${cid}/${number}.jpg`;
+
         try {
-          const response = await fetch(url);
+          let response = await fetch(pngUrl);
           if (response.ok) {
-            thumbnailUrl = url; // Set the thumbnail URL if the image exists
-            imageType = url.endsWith('.png') ? 'PNG' : 'JPEG'; // Determine the image type
-            console.log(`Thumbnail URL found: ${thumbnailUrl}`); // Debugging line
-            break; // Exit the loop if an image is found
+            imageUrls.push(pngUrl);
+            continue;
+          }
+
+          response = await fetch(jpgUrl);
+          if (response.ok) {
+            imageUrls.push(jpgUrl);
           }
         } catch (error) {
-          console.error(`Error fetching ${url}:`, error);
+          console.error(`Error fetching image ${number}:`, error);
         }
       }
 
-      // Set the thumbnail URL and image type in the state
-      setThumbnail(thumbnailUrl);
-      setImageType(imageType);
+      setThumbnails(imageUrls);
+      setImageType(imageUrls[0]?.endsWith('.png') ? 'PNG' : 'JPEG');
 
       const response = await fetch(`https://ipfs.io/ipfs/${cid}`);
       const text = await response.text();
@@ -175,6 +177,14 @@ export function CreateCollection({ onBack }: CreateCollectionProps) {
       setIpfsObjectCount(0);
     }
   }
+
+  const nextImage = () => {
+    setCurrentImageIndex((prevIndex) => (prevIndex + 1) % thumbnails.length);
+  };
+
+  const prevImage = () => {
+    setCurrentImageIndex((prevIndex) => (prevIndex - 1 + thumbnails.length) % thumbnails.length);
+  };
 
   const handlePaymentTokenChange = (index: number, field: 'identifier' | 'amount', value: string) => {
     const newPaymentTokens = [...formData.paymentTokens]
@@ -470,10 +480,30 @@ export function CreateCollection({ onBack }: CreateCollectionProps) {
                   <span>Invalid IPFS CID.</span>
                 </div>
               )}
-              {thumbnail && (
-                <div className="mt-4">
-                  <Image src={thumbnail} alt="Thumbnail" layout="responsive" width={500} height={300} />
-                  <p className="text-sm text-gray-500">Image Type: {imageType}</p> {/* Display image type */}
+              {thumbnails.length > 0 && (
+                <div className="mt-4 relative">
+                  <Image 
+                    src={thumbnails[currentImageIndex]} 
+                    alt={`Thumbnail ${currentImageIndex + 1}`} 
+                    layout="responsive" 
+                    width={500} 
+                    height={300} 
+                  />
+                  <button 
+                    onClick={prevImage} 
+                    className="absolute left-0 top-1/2 transform -translate-y-1/2 bg-black bg-opacity-50 p-2 rounded-full"
+                  >
+                    <ChevronLeft className="w-6 h-6 text-white" />
+                  </button>
+                  <button 
+                    onClick={nextImage} 
+                    className="absolute right-0 top-1/2 transform -translate-y-1/2 bg-black bg-opacity-50 p-2 rounded-full"
+                  >
+                    <ChevronRight className="w-6 h-6 text-white" />
+                  </button>
+                  <p className="text-sm text-gray-500 mt-2">
+                    Image {currentImageIndex + 1} of {thumbnails.length} | Type: {imageType}
+                  </p>
                 </div>
               )}
             </div>
