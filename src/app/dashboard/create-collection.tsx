@@ -43,6 +43,16 @@ interface CreateCollectionProps {
   onBack: () => void;
 }
 
+interface Attribute {
+  trait_type: string;
+  value: string;
+}
+
+interface NFTMetadata {
+  attributes: Attribute[];
+  // Add other fields if needed
+}
+
 export function CreateCollection({ onBack }: CreateCollectionProps) {
   const [formData, setFormData] = useState({
     collectionName: '',
@@ -67,6 +77,7 @@ export function CreateCollection({ onBack }: CreateCollectionProps) {
   const [jsonCount, setJsonCount] = useState(0);
   const [ipfsObjectCount, setIpfsObjectCount] = useState(0);
   const [thumbnails, setThumbnails] = useState<string[]>([]);
+  const [metadata, setMetadata] = useState<NFTMetadata[]>([]);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [imageType, setImageType] = useState(''); // State for image type
   const [royaltiesError, setRoyaltiesError] = useState('');
@@ -103,28 +114,35 @@ export function CreateCollection({ onBack }: CreateCollectionProps) {
     try {
       const imageNumbers = [2, 5, 10];
       const imageUrls: string[] = [];
+      const metadataArray: NFTMetadata[] = [];
 
       for (const number of imageNumbers) {
         const pngUrl = `https://ipfs.io/ipfs/${cid}/${number}.png`;
         const jpgUrl = `https://ipfs.io/ipfs/${cid}/${number}.jpg`;
+        const jsonUrl = `https://ipfs.io/ipfs/${cid}/${number}.json`;
 
         try {
-          let response = await fetch(pngUrl);
-          if (response.ok) {
-            imageUrls.push(pngUrl);
-            continue;
+          let imageResponse = await fetch(pngUrl);
+          if (!imageResponse.ok) {
+            imageResponse = await fetch(jpgUrl);
           }
-
-          response = await fetch(jpgUrl);
-          if (response.ok) {
-            imageUrls.push(jpgUrl);
+          if (imageResponse.ok) {
+            imageUrls.push(imageResponse.url);
+            
+            // Fetch and parse JSON metadata
+            const metadataResponse = await fetch(jsonUrl);
+            if (metadataResponse.ok) {
+              const jsonData: NFTMetadata = await metadataResponse.json();
+              metadataArray.push(jsonData);
+            }
           }
         } catch (error) {
-          console.error(`Error fetching image ${number}:`, error);
+          console.error(`Error fetching data for ${number}:`, error);
         }
       }
 
       setThumbnails(imageUrls);
+      setMetadata(metadataArray);
       setImageType(imageUrls[0]?.endsWith('.png') ? 'PNG' : 'JPEG');
 
       const response = await fetch(`https://ipfs.io/ipfs/${cid}`);
@@ -481,29 +499,41 @@ export function CreateCollection({ onBack }: CreateCollectionProps) {
                 </div>
               )}
               {thumbnails.length > 0 && (
-                <div className="mt-4 relative">
-                  <Image 
-                    src={thumbnails[currentImageIndex]} 
-                    alt={`Thumbnail ${currentImageIndex + 1}`} 
-                    layout="responsive" 
-                    width={500} 
-                    height={300} 
-                  />
+                <div className="mt-4 relative w-1/2 mx-auto">
+                  <div className="aspect-w-16 aspect-h-9 relative">
+                    <Image 
+                      src={thumbnails[currentImageIndex]} 
+                      alt={`Thumbnail ${currentImageIndex + 1}`} 
+                      layout="fill"
+                      objectFit="cover"
+                      className="rounded-lg"
+                    />
+                  </div>
                   <button 
                     onClick={prevImage} 
-                    className="absolute left-0 top-1/2 transform -translate-y-1/2 bg-black bg-opacity-50 p-2 rounded-full"
+                    className="absolute left-0 top-1/2 transform -translate-y-1/2 bg-black bg-opacity-50 p-1 rounded-full"
                   >
-                    <ChevronLeft className="w-6 h-6 text-white" />
+                    <ChevronLeft className="w-4 h-4 text-white" />
                   </button>
                   <button 
                     onClick={nextImage} 
-                    className="absolute right-0 top-1/2 transform -translate-y-1/2 bg-black bg-opacity-50 p-2 rounded-full"
+                    className="absolute right-0 top-1/2 transform -translate-y-1/2 bg-black bg-opacity-50 p-1 rounded-full"
                   >
-                    <ChevronRight className="w-6 h-6 text-white" />
+                    <ChevronRight className="w-4 h-4 text-white" />
                   </button>
-                  <p className="text-sm text-gray-500 mt-2">
+                  <p className="text-xs text-gray-500 mt-2 text-center">
                     Image {currentImageIndex + 1} of {thumbnails.length} | Type: {imageType}
                   </p>
+                  {metadata[currentImageIndex] && (
+                    <div className="mt-4 grid grid-cols-3 gap-2">
+                      {metadata[currentImageIndex].attributes.map((attr, index) => (
+                        <div key={index} className="bg-gray-800 p-2 rounded-md">
+                          <p className="text-xs font-semibold text-gray-400">{attr.trait_type}</p>
+                          <p className="text-sm text-white">{attr.value}</p>
+                        </div>
+                      ))}
+                    </div>
+                  )}
                 </div>
               )}
             </div>
