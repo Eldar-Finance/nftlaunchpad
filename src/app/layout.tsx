@@ -9,7 +9,7 @@ import App from './index';
 const inter = Inter({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
-  title: 'Template dApp Next.js',
+  title: 'QuantumX Launchpad',
   description:
     'A basic implementation of MultiversX dApp providing the basics for MultiversX authentication and TX signing.',
   icons: {
