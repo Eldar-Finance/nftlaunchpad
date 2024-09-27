@@ -6,7 +6,7 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/comp
 import { Label } from "@/components/ui/label"
 import { 
   Tag, Image as ImageIcon, Hash, DollarSign, 
-  LayoutGrid, Users, Pause, Play, Lock, Unlock, RefreshCw,
+  LayoutGrid, Users, Pause, Play, RefreshCw,
  Fingerprint, CheckCircle, XCircle
 } from 'lucide-react'
 import { useGetCollectionsInfo } from '@/hooks/useGetCollectionsInfo'
