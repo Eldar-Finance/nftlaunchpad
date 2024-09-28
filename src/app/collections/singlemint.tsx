@@ -193,18 +193,26 @@ export default function SingleCollectionMint({ collectionId, onBackClick }: Sing
                   <span className="text-white text-lg">Mint Token</span>
                 </div>
                 <Select value={selectedToken} onValueChange={setSelectedToken}>
-                  <SelectTrigger className="w-[180px]">
+                  <SelectTrigger className="w-[90px]">
                     <SelectValue placeholder="Select token" />
                   </SelectTrigger>
-                  <SelectContent>
+                  <SelectContent className="bg-gray-800 text-white">
                     {collectionData.mintCosts.map((cost) => (
                       <SelectItem key={cost.tokenIdentifier} value={cost.tokenIdentifier}>
                         <div className="flex items-center">
-                          <img 
-                            src={`https://tools.multiversx.com/assets-cdn/devnet/tokens/${cost.tokenIdentifier}/icon.png`}
-                            alt={getTokenName(cost.tokenIdentifier)}
-                            className="w-6 h-6 mr-2"
-                          />
+                          {cost.tokenIdentifier === 'EGLD' ? (
+                            <img 
+                              src="/assets/img/elrond-symbol.svg"
+                              alt="EGLD"
+                              className="w-6 h-6 mr-2"
+                            />
+                          ) : (
+                            <img 
+                              src={`https://tools.multiversx.com/assets-cdn/devnet/tokens/${cost.tokenIdentifier}/icon.png`}
+                              alt={getTokenName(cost.tokenIdentifier)}
+                              className="w-6 h-6 mr-2"
+                            />
+                          )}
                           {getTokenName(cost.tokenIdentifier)}
                         </div>
                       </SelectItem>
@@ -219,11 +227,19 @@ export default function SingleCollectionMint({ collectionId, onBackClick }: Sing
                   {selectedCost ? (
                     <>
                       {formatPrice(selectedCost.amount)}
-                      <img 
-                        src={`https://tools.multiversx.com/assets-cdn/devnet/tokens/${selectedToken}/icon.png`}
-                        alt={getTokenName(selectedToken)}
-                        className="w-6 h-6 ml-2"
-                      />
+                      {selectedToken === 'EGLD' ? (
+                        <img 
+                          src="/assets/img/elrond-symbol.svg"
+                          alt="EGLD"
+                          className="w-6 h-6 ml-2"
+                        />
+                      ) : (
+                        <img 
+                          src={`https://tools.multiversx.com/assets-cdn/devnet/tokens/${selectedToken}/icon.png`}
+                          alt={getTokenName(selectedToken)}
+                          className="w-6 h-6 ml-2"
+                        />
+                      )}
                     </>
                   ) : 'Select a token'}
                 </span>
