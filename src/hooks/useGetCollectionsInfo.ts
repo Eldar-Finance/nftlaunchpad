@@ -67,9 +67,9 @@ export const useGetCollectionsInfo = (collectionAddresses: string[]) => {
           // Convert hex to decimal for numeric fields
           const hexToDecimal = (hex: string) => parseInt(hex, 16);
           const hexToString = (hex: string) => Buffer.from(hex, 'hex').toString('utf-8');
-          console.log(`Enabled ?`, decodedData[14]);
+          // console.log(`Enabled ?`, decodedData[14]);
           // Construct the collection info object
-          const collectionInfo: CollectionInfo = {
+            const collectionInfo: CollectionInfo = {
             address,
             creatorAddress: Address.fromHex(decodedData[0]).bech32(),
             collectionIdentifier: hexToString(decodedData[1]),
@@ -95,15 +95,14 @@ export const useGetCollectionsInfo = (collectionAddresses: string[]) => {
             isPaused: decodedData[21] === '01',
             isPhaseWlOnly: decodedData[22] === '01',
             canUserTryToMint: decodedData[23] === '01',
-            mintCosts: decodedData.slice(24).map((cost, index, array) => {
-                if (index % 2 === 0) {
-                    return {
-                        tokenIdentifier: hexToString(cost),
-                        amount: hexToDecimal(array[index + 1] || '0')
-                    };
-                }
-                return undefined;
-            }).filter((item): item is { tokenIdentifier: string; amount: number } => item !== undefined),
+            mintCosts: decodedData // decodedData from 24 to end comes in 3-tuples of tokenIdentifier, empty, and amount
+              .slice(24)
+              .filter((_, index) => index % 3 === 0)
+              .map((tokenIdentifier, index) => ({
+                tokenIdentifier: hexToString(tokenIdentifier),
+                amount: hexToDecimal(decodedData[24 + index * 3 + 2])
+              })
+            )
           };
 
           fetchedCollectionsInfo.push(collectionInfo);
