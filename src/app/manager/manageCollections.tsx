@@ -21,16 +21,13 @@ import {
 import { GAS_PRICE, VERSION } from '@/localConstants';
 
 export default function CollectionManager({ collectionAddress }: { collectionAddress: string }) {
-  const [refreshTrigger, setRefreshTrigger] = useState(0);
   const { collectionsInfo, loading } = useGetCollectionsInfo([collectionAddress]);
   const { account } = useGetAccountInfo();
   const nonce = account.nonce;
   const { network } = useGetNetworkConfig();
   const { address: connectedAddress } = useGetAccountInfo();
 
-  const refreshCollectionInfo = useCallback(() => {
-    setRefreshTrigger(prev => prev + 1);
-  }, []);
+ 
 
   const handleAction = async (action: string) => {
     console.log(`Performing action: ${action} on collection: ${collectionAddress}`)
@@ -79,7 +76,6 @@ export default function CollectionManager({ collectionAddress }: { collectionAdd
       });
 
       console.log(`Action completed, session ID:`, sessionId);
-      refreshCollectionInfo(); // Refresh collection info after successful action
     } catch (error) {
       console.error('Action failed:', error);
     }
