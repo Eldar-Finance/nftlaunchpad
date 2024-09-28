@@ -82,8 +82,9 @@ export default function CollectionManager({ collectionAddress }: { collectionAdd
     const costsHex = costs.map(cost => {
       const tokenLengthHex = cost.token.toString().length.toString(16).padStart(8, '0')
       const tokenHex = Buffer.from(cost.token.toString()).toString('hex')
+      const amountLengthHex = cost.amount.toString().length.toString(16).padStart(8, '0')
       const amountHex = cost.amount.times(1e18).integerValue().toString(16).padStart(16, '0')
-      return `${tokenLengthHex}${tokenHex}${amountHex}`
+      return `${tokenLengthHex}${tokenHex}${amountLengthHex}${amountHex}`
     }).join('')
 
     // Construct the hex arguments
