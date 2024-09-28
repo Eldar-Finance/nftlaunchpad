@@ -68,15 +68,19 @@ export default function SingleCollectionMint({ collectionId, onBackClick }: Sing
     return isNaN(Number(formattedPrice)) ? '0.00' : formattedPrice;
   };
 
+  const getTokenName = (identifier: string) => {
+    return identifier.split('-')[0];
+  };
+
   const handleMint = () => {
     console.log(`Minting ${mintAmount} NFTs from collection ${collectionId} with token ${selectedToken}`);
     // Implement minting logic here
   };
 
   const incrementMintAmount = () => {
-    if (mintAmount < (collectionData?.maxAmountPerMint || 1)) {
+  
       setMintAmount(prev => prev + 1)
-    }
+    
   }
 
   const decrementMintAmount = () => {
@@ -197,11 +201,11 @@ export default function SingleCollectionMint({ collectionId, onBackClick }: Sing
                       <SelectItem key={cost.tokenIdentifier} value={cost.tokenIdentifier}>
                         <div className="flex items-center">
                           <img 
-                            src={`https://devnet-api.multiversx.com/${cost.tokenIdentifier}/logo/png`} 
-                            alt={cost.tokenIdentifier}
+                            src={`https://tools.multiversx.com/assets-cdn/devnet/tokens/${cost.tokenIdentifier}/icon.png`}
+                            alt={getTokenName(cost.tokenIdentifier)}
                             className="w-6 h-6 mr-2"
                           />
-                          {cost.tokenIdentifier}
+                          {getTokenName(cost.tokenIdentifier)}
                         </div>
                       </SelectItem>
                     ))}
@@ -211,8 +215,17 @@ export default function SingleCollectionMint({ collectionId, onBackClick }: Sing
 
               <div className="flex justify-between items-center">
                 <span className="text-white text-lg">Mint Price</span>
-                <span className="text-white text-lg font-bold">
-                  {selectedCost ? `${formatPrice(selectedCost.amount)} ${selectedToken}` : 'Select a token'}
+                <span className="text-white text-lg font-bold flex items-center">
+                  {selectedCost ? (
+                    <>
+                      {formatPrice(selectedCost.amount)}
+                      <img 
+                        src={`https://tools.multiversx.com/assets-cdn/devnet/tokens/${selectedToken}/icon.png`}
+                        alt={getTokenName(selectedToken)}
+                        className="w-6 h-6 ml-2"
+                      />
+                    </>
+                  ) : 'Select a token'}
                 </span>
               </div>
 
@@ -227,7 +240,6 @@ export default function SingleCollectionMint({ collectionId, onBackClick }: Sing
                   <Input 
                     type="number" 
                     min={1} 
-                    max={collectionData.maxAmountPerMint}
                     value={mintAmount} 
                     onChange={handleInputChange}
                     className="w-16 bg-transparent text-white border-0 text-center text-lg [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
@@ -248,8 +260,15 @@ export default function SingleCollectionMint({ collectionId, onBackClick }: Sing
                 </Button>
               </div>
 
-              <p className="text-lg text-gray-300">
-                Total Cost: {totalCost} {selectedToken}
+              <p className="text-lg text-gray-300 flex items-center">
+                Total Cost: {totalCost}
+                {selectedToken && (
+                  <img 
+                    src={`https://tools.multiversx.com/assets-cdn/devnet/tokens/${selectedToken}/icon.png`}
+                    alt={getTokenName(selectedToken)}
+                    className="w-6 h-6 ml-2"
+                  />
+                )}
               </p>
             </CardContent>
           </Card>
