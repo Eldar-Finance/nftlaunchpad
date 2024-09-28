@@ -62,11 +62,6 @@
             {
                 "name": "tags",
                 "type": "bytes"
-            },
-            {
-                "name": "costs",
-                "type": "variadic<multi<EgldOrEsdtTokenIdentifier,BigUint>>",
-                "multi_arg": true
             }
         ],
         "outputs": []
@@ -83,6 +78,26 @@
             "outputs": [
                 {
                     "type": "TokenIdentifier"
+                }
+            ]
+        },
+        {
+            "name": "getTotalMinted",
+            "mutability": "readonly",
+            "inputs": [],
+            "outputs": [
+                {
+                    "type": "u64"
+                }
+            ]
+        },
+        {
+            "name": "getCollectionInfo",
+            "mutability": "readonly",
+            "inputs": [],
+            "outputs": [
+                {
+                    "type": "Collection"
                 }
             ]
         },
@@ -197,42 +212,6 @@
             ]
         },
         {
-            "name": "getCostTokens",
-            "mutability": "readonly",
-            "inputs": [],
-            "outputs": [
-                {
-                    "type": "variadic<EgldOrEsdtTokenIdentifier>",
-                    "multi_result": true
-                }
-            ]
-        },
-        {
-            "name": "getCostAmount",
-            "mutability": "readonly",
-            "inputs": [
-                {
-                    "name": "token",
-                    "type": "EgldOrEsdtTokenIdentifier"
-                }
-            ],
-            "outputs": [
-                {
-                    "type": "BigUint"
-                }
-            ]
-        },
-        {
-            "name": "getMaxAmountPerMint",
-            "mutability": "readonly",
-            "inputs": [],
-            "outputs": [
-                {
-                    "type": "u64"
-                }
-            ]
-        },
-        {
             "name": "getIpfsIndices",
             "mutability": "readonly",
             "inputs": [],
@@ -265,6 +244,16 @@
             "outputs": []
         },
         {
+            "name": "getMaxAmountPerTransaction",
+            "mutability": "readonly",
+            "inputs": [],
+            "outputs": [
+                {
+                    "type": "u64"
+                }
+            ]
+        },
+        {
             "name": "getIsPaused",
             "mutability": "readonly",
             "inputs": [],
@@ -284,6 +273,56 @@
             "outputs": []
         },
         {
+            "docs": [
+                "Start a new phase.",
+                "Comments:",
+                "- `user_max_mints` - Maximum number of mints per user in the phase. If no limit, pass 0.",
+                "- `max_mints` - Maximum number of mints in the phase. If no limit, pass 0.",
+                "#### Important:",
+                "Starting a phase will also enable minting."
+            ],
+            "name": "startPhase",
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "phase_name",
+                    "type": "bytes"
+                },
+                {
+                    "name": "user_max_mints",
+                    "type": "u64"
+                },
+                {
+                    "name": "max_mints",
+                    "type": "u64"
+                },
+                {
+                    "name": "costs",
+                    "type": "variadic<multi<EgldOrEsdtTokenIdentifier,BigUint>>",
+                    "multi_arg": true
+                },
+                {
+                    "name": "whitelisted_users",
+                    "type": "variadic<Address>",
+                    "multi_arg": true
+                }
+            ],
+            "outputs": [],
+            "allow_multiple_var_args": true
+        },
+        {
+            "name": "claimRoyalties",
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "tokens",
+                    "type": "variadic<EgldOrEsdtTokenIdentifier>",
+                    "multi_arg": true
+                }
+            ],
+            "outputs": []
+        },
+        {
             "name": "enableMinting",
             "mutability": "mutable",
             "inputs": [],
@@ -296,12 +335,193 @@
             "outputs": []
         },
         {
-            "name": "claimRoyalties",
+            "name": "setCollectionName",
             "mutability": "mutable",
             "inputs": [
                 {
-                    "name": "tokens",
-                    "type": "variadic<EgldOrEsdtTokenIdentifier>",
+                    "name": "name",
+                    "type": "bytes"
+                }
+            ],
+            "outputs": []
+        },
+        {
+            "name": "setSingleNftName",
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "name",
+                    "type": "bytes"
+                }
+            ],
+            "outputs": []
+        },
+        {
+            "name": "setTicker",
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "ticker",
+                    "type": "bytes"
+                }
+            ],
+            "outputs": []
+        },
+        {
+            "name": "setDescription",
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "description",
+                    "type": "bytes"
+                }
+            ],
+            "outputs": []
+        },
+        {
+            "name": "setRoyalties",
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "royalties",
+                    "type": "u64"
+                }
+            ],
+            "outputs": []
+        },
+        {
+            "name": "setMaxSupply",
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "max_supply",
+                    "type": "u64"
+                }
+            ],
+            "outputs": []
+        },
+        {
+            "name": "setIpfsCid",
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "ipfs_cid",
+                    "type": "bytes"
+                }
+            ],
+            "outputs": []
+        },
+        {
+            "name": "setFileEnding",
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "file_ending",
+                    "type": "bytes"
+                }
+            ],
+            "outputs": []
+        },
+        {
+            "name": "setHasJsonMetadata",
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "has_json_metadata",
+                    "type": "bool"
+                }
+            ],
+            "outputs": []
+        },
+        {
+            "name": "setTags",
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "tags",
+                    "type": "bytes"
+                }
+            ],
+            "outputs": []
+        },
+        {
+            "name": "setPhaseName",
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "name",
+                    "type": "bytes"
+                }
+            ],
+            "outputs": []
+        },
+        {
+            "name": "setUserMaxMintsInPhase",
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "max_mints",
+                    "type": "u64"
+                }
+            ],
+            "outputs": []
+        },
+        {
+            "name": "setMaxMintsInPhase",
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "max_mints",
+                    "type": "u64"
+                }
+            ],
+            "outputs": []
+        },
+        {
+            "name": "setCostInPhase",
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "token",
+                    "type": "EgldOrEsdtTokenIdentifier"
+                },
+                {
+                    "name": "amount",
+                    "type": "BigUint"
+                }
+            ],
+            "outputs": []
+        },
+        {
+            "name": "removeCostFromPhase",
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "token",
+                    "type": "EgldOrEsdtTokenIdentifier"
+                }
+            ],
+            "outputs": []
+        },
+        {
+            "name": "addWhitelistedUsersInPhase",
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "users",
+                    "type": "variadic<Address>",
+                    "multi_arg": true
+                }
+            ],
+            "outputs": []
+        },
+        {
+            "name": "removeWhitelistedUsersFromPhase",
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "users",
+                    "type": "variadic<Address>",
                     "multi_arg": true
                 }
             ],
@@ -337,45 +557,50 @@
             ]
         },
         {
-            "name": "getTotalMinted",
-            "mutability": "readonly",
-            "inputs": [],
-            "outputs": [
-                {
-                    "type": "u64"
-                }
-            ]
-        },
-        {
             "docs": [
                 "#### Returns all the information about the Minter:",
                 "",
                 "- Creator Address",
                 "- Collection Identifier",
                 "- List of Strings:",
-                "    - Collection Name",
-                "    - Single NFT Name",
+                "    - Collection name",
+                "    - Single NFT name",
                 "    - Ticker",
                 "    - Description",
                 "    - IPFS CID",
-                "    - File Ending (png, jpg, etc.)",
+                "    - File ending (png, jpg, etc.)",
                 "    - Tags",
+                "    - Phase name",
                 "- List of Numbers:",
                 "    - Royalties",
-                "    - Max Supply",
-                "    - Max Amount Per Mint",
-                "    - Total NFTs Minted",
+                "    - Total minted (overall)",
+                "    - Max supply",
+                "    - Max amount per tranascation (generic prerequisite)",
+                "    - Total NFTs minted",
+                "    - Phase ID",
+                "    - User max mints",
+                "    - User minted",
+                "    - Max mints",
+                "    - Minted",
                 "- List of Booleans:",
-                "    - Has JSON Metadata",
-                "    - Is Minting Enabled (by Creator)",
-                "    - Is Paused (by Protocol)",
-                "- List of Lists about the mint costs:",
-                "    - Cost Token Identifier",
-                "    - Cost Amount"
+                "    - Has JSON metadata",
+                "    - Is minting enabled (by Creator)",
+                "    - Is paused (by Protocol)",
+                "    - Is Phase WL-only",
+                "    - Can user try to mint (if not WL-only, it will be always true; otherwise, it will be true if the user is whitelisted)",
+                "- List payment options: (multiple instances sequentially)",
+                "    - Token",
+                "    - Amount"
             ],
             "name": "getMinterInfo",
             "mutability": "readonly",
-            "inputs": [],
+            "inputs": [
+                {
+                    "name": "opt_address",
+                    "type": "optional<Address>",
+                    "multi_arg": true
+                }
+            ],
             "outputs": [
                 {
                     "type": "Address"
@@ -398,6 +623,161 @@
                 {
                     "type": "variadic<multi<EgldOrEsdtTokenIdentifier,BigUint>>",
                     "multi_result": true
+                }
+            ]
+        },
+        {
+            "name": "getCurrentPhaseInfo",
+            "mutability": "readonly",
+            "inputs": [
+                {
+                    "name": "user",
+                    "type": "Address"
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "Phase"
+                }
+            ]
+        },
+        {
+            "name": "getCurrentPhaseId",
+            "mutability": "readonly",
+            "inputs": [],
+            "outputs": [
+                {
+                    "type": "u64"
+                }
+            ]
+        },
+        {
+            "name": "getPhaseName",
+            "mutability": "readonly",
+            "inputs": [
+                {
+                    "name": "phase_id",
+                    "type": "u64"
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "bytes"
+                }
+            ]
+        },
+        {
+            "name": "getWhitelistedUsersInPhase",
+            "mutability": "readonly",
+            "inputs": [
+                {
+                    "name": "phase_id",
+                    "type": "u64"
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "variadic<Address>",
+                    "multi_result": true
+                }
+            ]
+        },
+        {
+            "name": "getUserMaxMintsInPhase",
+            "mutability": "readonly",
+            "inputs": [
+                {
+                    "name": "phase_id",
+                    "type": "u64"
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "u64"
+                }
+            ]
+        },
+        {
+            "name": "getUserMintedInPhase",
+            "mutability": "readonly",
+            "inputs": [
+                {
+                    "name": "phase_id",
+                    "type": "u64"
+                },
+                {
+                    "name": "address",
+                    "type": "Address"
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "u64"
+                }
+            ]
+        },
+        {
+            "name": "getMaxMintsInPhase",
+            "mutability": "readonly",
+            "inputs": [
+                {
+                    "name": "phase_id",
+                    "type": "u64"
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "u64"
+                }
+            ]
+        },
+        {
+            "name": "getMintedInPhase",
+            "mutability": "readonly",
+            "inputs": [
+                {
+                    "name": "phase_id",
+                    "type": "u64"
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "u64"
+                }
+            ]
+        },
+        {
+            "name": "getCostTokensInPhase",
+            "mutability": "readonly",
+            "inputs": [
+                {
+                    "name": "phase_id",
+                    "type": "u64"
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "variadic<EgldOrEsdtTokenIdentifier>",
+                    "multi_result": true
+                }
+            ]
+        },
+        {
+            "name": "getCostAmountInPhase",
+            "mutability": "readonly",
+            "inputs": [
+                {
+                    "name": "phase_id",
+                    "type": "u64"
+                },
+                {
+                    "name": "token",
+                    "type": "EgldOrEsdtTokenIdentifier"
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "BigUint"
                 }
             ]
         }
@@ -452,6 +832,72 @@
     "esdtAttributes": [],
     "hasCallback": true,
     "types": {
+        "Collection": {
+            "type": "struct",
+            "fields": [
+                {
+                    "name": "creator",
+                    "type": "Address"
+                },
+                {
+                    "name": "collection_name",
+                    "type": "bytes"
+                },
+                {
+                    "name": "single_nft_name",
+                    "type": "bytes"
+                },
+                {
+                    "name": "ticker",
+                    "type": "bytes"
+                },
+                {
+                    "name": "description",
+                    "type": "bytes"
+                },
+                {
+                    "name": "royalties",
+                    "type": "u64"
+                },
+                {
+                    "name": "total_minted",
+                    "type": "u64"
+                },
+                {
+                    "name": "max_supply",
+                    "type": "u64"
+                },
+                {
+                    "name": "ipfs_cid",
+                    "type": "bytes"
+                },
+                {
+                    "name": "file_ending",
+                    "type": "bytes"
+                },
+                {
+                    "name": "has_json_metadata",
+                    "type": "bool"
+                },
+                {
+                    "name": "tags",
+                    "type": "bytes"
+                }
+            ]
+        },
+        "Cost": {
+            "type": "struct",
+            "fields": [
+                {
+                    "name": "token",
+                    "type": "EgldOrEsdtTokenIdentifier"
+                },
+                {
+                    "name": "amount",
+                    "type": "BigUint"
+                }
+            ]
+        },
         "EgldOrEsdtTokenPayment": {
             "type": "struct",
             "fields": [
@@ -466,6 +912,47 @@
                 {
                     "name": "amount",
                     "type": "BigUint"
+                }
+            ]
+        },
+        "Phase": {
+            "type": "struct",
+            "fields": [
+                {
+                    "name": "id",
+                    "type": "u64"
+                },
+                {
+                    "name": "name",
+                    "type": "bytes"
+                },
+                {
+                    "name": "user_max_mints",
+                    "type": "u64"
+                },
+                {
+                    "name": "user_minted",
+                    "type": "u64"
+                },
+                {
+                    "name": "max_mints",
+                    "type": "u64"
+                },
+                {
+                    "name": "minted",
+                    "type": "u64"
+                },
+                {
+                    "name": "costs",
+                    "type": "List<Cost>"
+                },
+                {
+                    "name": "is_private",
+                    "type": "bool"
+                },
+                {
+                    "name": "can_user_mint",
+                    "type": "bool"
                 }
             ]
         }

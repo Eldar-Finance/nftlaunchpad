@@ -176,11 +176,6 @@
                 {
                     "name": "tags",
                     "type": "bytes"
-                },
-                {
-                    "name": "costs",
-                    "type": "variadic<multi<EgldOrEsdtTokenIdentifier,BigUint>>",
-                    "multi_arg": true
                 }
             ],
             "outputs": []

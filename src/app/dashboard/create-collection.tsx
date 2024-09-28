@@ -56,14 +56,13 @@ interface CreateCollectionProps {
 export function CreateCollection({ onBack }: CreateCollectionProps) {
   const [formData, setFormData] = useState({
     collectionName: '',
-    nftName: '', // New field for NFT Name
+    nftName: '',
     ticker: '',
     description: '',
     royalties: '',
     maxSupply: '',
-    paymentTokens: [{ identifier: '', amount: '' }],
     ipfsCid: '',
-    tags: '' // New field for Tags
+    tags: ''
   })
   
   const { network } = useGetNetworkConfig();
@@ -215,24 +214,6 @@ export function CreateCollection({ onBack }: CreateCollectionProps) {
     setCurrentImageIndex((prevIndex) => (prevIndex - 1 + thumbnails.length) % thumbnails.length);
   };
 
-  const handlePaymentTokenChange = (index: number, field: 'identifier' | 'amount', value: string) => {
-    const newPaymentTokens = [...formData.paymentTokens]
-    newPaymentTokens[index][field] = value
-    setFormData(prev => ({ ...prev, paymentTokens: newPaymentTokens }))
-  }
-
-  const addPaymentToken = () => {
-    setFormData(prev => ({
-      ...prev,
-      paymentTokens: [...prev.paymentTokens, { identifier: '', amount: '' }]
-    }))
-  }
-
-  const removePaymentToken = (index: number) => {
-    const newPaymentTokens = formData.paymentTokens.filter((_, i) => i !== index)
-    setFormData(prev => ({ ...prev, paymentTokens: newPaymentTokens }))
-  }
-
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
     if (royaltiesError) {
@@ -248,16 +229,10 @@ export function CreateCollection({ onBack }: CreateCollectionProps) {
       console.error('Invalid royalties value');
       return;
     }
-    const costs = formData.paymentTokens.map(token => {
-        const identifierHex = stringToHex(token.identifier);
-        const amountInHex = (parseFloat(token.amount) * 1e18).toString(16);
-        const amountHex = ensureEvenHex(amountInHex);
-        return `${identifierHex}@${amountHex}`;
-    });
 
-    // Ensure all other hex values are also even
+    // Ensure all hex values are even
     const name = ensureEvenHex(stringToHex(formData.collectionName));
-    const nftName = ensureEvenHex(stringToHex(formData.nftName)); // New: NFT Name
+    const nftName = ensureEvenHex(stringToHex(formData.nftName));
     const ticker = ensureEvenHex(stringToHex(formData.ticker));
     const description = ensureEvenHex(stringToHex(formData.description));
     const royalties = ensureEvenHex((parseFloat(formData.royalties) * 100).toString(16));
@@ -265,15 +240,15 @@ export function CreateCollection({ onBack }: CreateCollectionProps) {
     const ipfsCid = ensureEvenHex(stringToHex(formData.ipfsCid));
     const fileEnding = ensureEvenHex(stringToHex(imageType.toLowerCase()));
     const hasJsonMetadata = ensureEvenHex('1');
-    const tags = ensureEvenHex(stringToHex(formData.tags)); // New: Tags
+    const tags = ensureEvenHex(stringToHex(formData.tags));
 
-    // Construct hexArguments
-    const hexArguments = `createCollectionMinter@${name}@${nftName}@${ticker}@${description}@${royalties}@${maxSupply}@${ipfsCid}@${fileEnding}@${hasJsonMetadata}@${tags}@${costs.join('@')}`;
+    // Construct hexArguments without costs
+    const hexArguments = `createCollectionMinter@${name}@${nftName}@${ticker}@${description}@${royalties}@${maxSupply}@${ipfsCid}@${fileEnding}@${hasJsonMetadata}@${tags}`;
 
     const createCollectionTransaction = newTransaction({
         value: 0,
         data: hexArguments,
-        receiver: "erd1qqqqqqqqqqqqqpgqq0hej0p0smnn8ddpshaa903778nnh6pwu7zstg8c0x", // Fixed receiver address
+        receiver: "erd1qqqqqqqqqqqqqpgqq0hej0p0smnn8ddpshaa903778nnh6pwu7zstg8c0x",
         gasLimit: 20000000,
         gasPrice: GAS_PRICE,
         chainID: network.chainId,
@@ -552,49 +527,6 @@ export function CreateCollection({ onBack }: CreateCollectionProps) {
                   </div>
                 ) : null}
               </div>
-            </div>
-            <div>
-              <Label className="flex items-center text-sm font-medium text-gray-300">
-                <Coins className="w-4 h-4 mr-2 text-blue-400" />
-                Payment Tokens and Prices
-                <TooltipProvider delayDuration={100}>
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <Info className="w-4 h-4 ml-2 cursor-help text-gray-500" />
-                    </TooltipTrigger>
-                    <TooltipContent side="right" className="bg-gray-800 text-white p-2 rounded-md text-xs">
-                      <p>Specify the token identifiers and amounts per NFT.</p>
-                    </TooltipContent>
-                  </Tooltip>
-                </TooltipProvider>
-              </Label>
-              {formData.paymentTokens.map((token, index) => (
-                <div key={index} className="flex gap-2 mt-2">
-                  <Input
-                    placeholder="Token Identifier"
-                    value={token.identifier}
-                    onChange={(e) => handlePaymentTokenChange(index, 'identifier', e.target.value)}
-                    className="bg-gray-800 border-gray-700 text-white placeholder-gray-500 focus:ring-blue-500 focus:border-blue-500"
-                  />
-                  <Input
-                    placeholder="Amount per NFT"
-                    value={token.amount}
-                    onChange={(e) => handlePaymentTokenChange(index, 'amount', e.target.value)}
-                    type="number"
-                    min="0"
-                    step="0.000001"
-                    className="bg-gray-800 border-gray-700 text-white placeholder-gray-500 focus:ring-blue-500 focus:border-blue-500"
-                  />
-                  {index > 0 && (
-                    <Button onClick={() => removePaymentToken(index)} variant="destructive" size="icon">
-                      <Trash2 className="w-4 h-4" />
-                    </Button>
-                  )}
-                </div>
-              ))}
-              <Button onClick={addPaymentToken} variant="outline" className="mt-2 text-blue-400 border-blue-400 hover:bg-blue-400 hover:text-gray-900">
-                <Plus className="w-4 h-4 mr-2" /> Add Token
-              </Button>
             </div>
             <div>
               <Label htmlFor="tags" className="flex items-center text-sm font-medium text-gray-300">

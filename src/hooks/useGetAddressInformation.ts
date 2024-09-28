@@ -23,7 +23,7 @@ export const useGetMinterInformation = (connectedAddress: string) => {
   
   const [minterInfo, setMinterInfo] = useState<string[]>([]); // Change 'unknown' to 'string[]'
   const proxy = new ProxyNetworkProvider(network.apiAddress);
-  const minterSc = new SmartContract({ address: new Address('erd1qqqqqqqqqqqqqpgqq0hej0p0smnn8ddpshaa903778nnh6pwu7zstg8c0x') }); // Provide the contract address
+  const minterSc = new SmartContract({ address: new Address('erd1qqqqqqqqqqqqqpgq0vct9qkqcnr0vgj8hsvdmufzxy9nevppu7zs8qzs0r') }); // Provide the contract address
 
   const getMinterInformation = async () => {
     try {
