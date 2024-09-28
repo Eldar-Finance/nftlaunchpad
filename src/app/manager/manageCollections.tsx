@@ -30,6 +30,11 @@ interface Cost {
   amount: BigNumber
 }
 
+function toEvenLengthHex(value: number): string {
+  let hex = value.toString(16);
+  return hex.length % 2 ? '0' + hex : hex;
+}
+
 export default function CollectionManager({ collectionAddress }: { collectionAddress: string }) {
   const { collectionsInfo, loading } = useGetCollectionsInfo([collectionAddress])
   const { account } = useGetAccountInfo()
@@ -70,8 +75,8 @@ export default function CollectionManager({ collectionAddress }: { collectionAdd
     const phaseNameHex = Buffer.from(phaseName).toString('hex')
 
     // Convert user max mints and max mints to hex
-    const userMaxMintsHex = parseInt(userMaxMints).toString(16).padStart(16, '0')
-    const maxMintsHex = parseInt(maxMints).toString(16).padStart(16, '0')
+    const userMaxMintsHex = toEvenLengthHex(parseInt(userMaxMints));
+    const maxMintsHex = toEvenLengthHex(parseInt(maxMints));
 
     // Format costs
     const costsHex = costs.map(cost => {
