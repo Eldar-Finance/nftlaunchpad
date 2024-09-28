@@ -85,25 +85,15 @@ export default function CollectionManager({ collectionAddress }: { collectionAdd
     // Format costs
     const costsHex = costs.map(cost => {
       const tokenHex = Buffer.from(cost.token.toString()).toString('hex');
-      console.log('⚠️ ~ tokenHex:', tokenHex);
-      
       const tokenLength = toEvenLengthHex(tokenHex.length/2);
-      console.log('⚠️ ~ tokenLength:', tokenLength);
-
-      const tokenLengthHex = tokenLength.toString().padStart(8 - Number(tokenLength.toString().length), '0')
-      console.log('⚠️ ~ tokenLengthHex:', tokenLengthHex);
+      const tokenLengthHex = tokenLength.toString().padStart(8, '0')
  
       const amountHex = toEvenLength(cost.amount.times(1e18).integerValue().toString(16));
-      console.log('⚠️ ~ amountHex:', amountHex);
- 
       const amountLength = toEvenLengthHex(amountHex.length/2);
-      console.log('⚠️ ~ amountLength:', amountLength);
+      const amountLengthHex =  toEvenLengthHex(amountLength.toString().padStart(16, '0'))
 
-      const amountLengthHex =  toEvenLengthHex(amountLength.toString().padStart(16 - Number(amountLength.toString().length), '0'))
-      console.log('⚠️ ~ amountLengthHex:', amountLengthHex);
       return `${tokenLengthHex}${tokenHex}${amountLengthHex}${amountHex}`
     }).join('')
-    console.log('⚠️ ~ costsHex:', costsHex);
 
     // Construct the hex arguments
     let hexArguments = `startPhase@${phaseNameHex}@${userMaxMintsHex}@${maxMintsHex}@${costsHex}`
