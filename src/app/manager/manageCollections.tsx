@@ -1,6 +1,5 @@
 'use client'
 
-
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
@@ -11,38 +10,42 @@ import {
  Fingerprint, CheckCircle, XCircle, Plus, Minus
 } from 'lucide-react'
 import { useGetCollectionsInfo } from '@/hooks/useGetCollectionsInfo'
-import { Address } from '@multiversx/sdk-core/out';
-import { newTransaction } from '@/helpers/sdkDappHelpers';
-import { signAndSendTransactions } from '@/helpers/signAndSendTransactions';
+import { Address, TokenIdentifierValue } from '@multiversx/sdk-core/out'
+import { newTransaction } from '@/helpers/sdkDappHelpers'
+import { signAndSendTransactions } from '@/helpers/signAndSendTransactions'
 import {
   useGetNetworkConfig,
   useGetAccountInfo
-} from '@/hooks/sdkDappHooks';
-import { GAS_PRICE, VERSION } from '@/localConstants';
-import { useRouter } from 'next/navigation';
+} from '@/hooks/sdkDappHooks'
+import { GAS_PRICE, VERSION } from '@/localConstants'
+import { useRouter } from 'next/navigation'
 import { useState } from 'react'
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
-import { BytesValue } from '@multiversx/sdk-core/out';
+import { BytesValue } from '@multiversx/sdk-core/out'
+import BigNumber from 'bignumber.js'
+
+interface Cost {
+  token: TokenIdentifierValue
+  amount: BigNumber
+}
 
 export default function CollectionManager({ collectionAddress }: { collectionAddress: string }) {
-  const { collectionsInfo, loading } = useGetCollectionsInfo([collectionAddress]);
-
-  console.log(collectionsInfo)
-  const { account } = useGetAccountInfo();
-  const nonce = account.nonce;
-  const { network } = useGetNetworkConfig();
-  const { address: connectedAddress } = useGetAccountInfo();
-  const router = useRouter();
+  const { collectionsInfo, loading } = useGetCollectionsInfo([collectionAddress])
+  const { account } = useGetAccountInfo()
+  const nonce = account.nonce
+  const { network } = useGetNetworkConfig()
+  const { address: connectedAddress } = useGetAccountInfo()
+  const router = useRouter()
 
   const [phaseName, setPhaseName] = useState('')
   const [userMaxMints, setUserMaxMints] = useState('')
   const [maxMints, setMaxMints] = useState('')
-  const [costs, setCosts] = useState([{ tokenIdentifier: '', amount: '' }])
+  const [costs, setCosts] = useState<Cost[]>([])
   const [whitelist, setWhitelist] = useState('')
 
   const handleAddCost = () => {
-    setCosts([...costs, { tokenIdentifier: '', amount: '' }])
+    setCosts([...costs, { token: new TokenIdentifierValue(''), amount: new BigNumber(0) }])
   }
 
   const handleRemoveCost = (index: number) => {
@@ -50,13 +53,13 @@ export default function CollectionManager({ collectionAddress }: { collectionAdd
     setCosts(newCosts)
   }
 
-  const handleCostChange = (index: number, field: 'tokenIdentifier' | 'amount', value: string) => {
-    const newCosts = costs.map((cost, i) => {
-      if (i === index) {
-        return { ...cost, [field]: value }
-      }
-      return cost
-    })
+  const handleCostChange = (index: number, field: keyof Cost, value: string) => {
+    const newCosts = [...costs]
+    if (field === 'token') {
+      newCosts[index].token = new TokenIdentifierValue(value)
+    } else if (field === 'amount') {
+      newCosts[index].amount = new BigNumber(value)
+    }
     setCosts(newCosts)
   }
 
@@ -64,34 +67,33 @@ export default function CollectionManager({ collectionAddress }: { collectionAdd
     e.preventDefault()
 
     // Convert phase name to hex
-    const phaseNameHex = Buffer.from(phaseName).toString('hex');
+    const phaseNameHex = Buffer.from(phaseName).toString('hex')
 
     // Convert user max mints and max mints to hex
-    const userMaxMintsHex = parseInt(userMaxMints).toString(16).padStart(16, '0');
-    const maxMintsHex = parseInt(maxMints).toString(16).padStart(16, '0');
+    const userMaxMintsHex = parseInt(userMaxMints).toString(16).padStart(16, '0')
+    const maxMintsHex = parseInt(maxMints).toString(16).padStart(16, '0')
 
     // Format costs
-    const costsString = costs.map(cost => {
-      const amountDec = (parseFloat(cost.amount) * 1e18).toFixed(0); // Ensure no decimal places
-      return `{token:${cost.tokenIdentifier},amount:${amountDec}}`;
-    }).join(',');
+    const costsHex = costs.map(cost => {
+      const tokenLengthHex = cost.token.toString().length.toString(16).padStart(8, '0')
+      const tokenHex = Buffer.from(cost.token.toString()).toString('hex')
+      const amountHex = cost.amount.times(1e18).integerValue().toString(16).padStart(16, '0')
+      return `${tokenLengthHex}${tokenHex}${amountHex}`
+    }).join('')
 
-    const costsBytes = BytesValue.fromUTF8(`[${costsString}]`);
-    const costsHex = Buffer.from(costsBytes.toString()).toString('hex');
+    // Construct the hex arguments
+    let hexArguments = `startPhase@${phaseNameHex}@${userMaxMintsHex}@${maxMintsHex}@${costsHex}`
 
     // Format whitelist
     const whitelistAddresses = whitelist
       .split('\n')
       .map(address => address.trim())
-      .filter(address => address.startsWith('erd'));
-
-    // Construct the hex arguments
-    let hexArguments = `startPhase@${phaseNameHex}@${userMaxMintsHex}@${maxMintsHex}@${costsHex}`;
+      .filter(address => address.startsWith('erd'))
 
     // Add whitelist addresses if any
     if (whitelistAddresses.length > 0) {
-      const whitelistHex = whitelistAddresses.map(address => Buffer.from(address).toString('hex')).join('@');
-      hexArguments += `@${whitelistHex}`;
+      const whitelistHex = whitelistAddresses.map(address => Buffer.from(address).toString('hex')).join('@')
+      hexArguments += `@${whitelistHex}`
     }
 
     console.log(hexArguments)
@@ -106,7 +108,7 @@ export default function CollectionManager({ collectionAddress }: { collectionAdd
       nonce: nonce,
       sender: new Address(connectedAddress),
       version: VERSION,
-    });
+    })
 
     try {
       const sessionId = await signAndSendTransactions({
@@ -117,34 +119,34 @@ export default function CollectionManager({ collectionAddress }: { collectionAdd
           errorMessage: 'Failed to create phase',
           successMessage: 'Phase created successfully',
         }
-      });
-      console.log(`Phase created, session ID:`, sessionId);
+      })
+      console.log(`Phase created, session ID:`, sessionId)
     } catch (error) {
-      console.error('Failed to create phase:', error);
+      console.error('Failed to create phase:', error)
     }
   }
 
   const handleAction = async (action: string) => {
     console.log(`Performing action: ${action} on collection: ${collectionAddress}`)
     
-    let endpoint = '';
-    let processingMessage = '';
-    let successMessage = '';
+    let endpoint = ''
+    let processingMessage = ''
+    let successMessage = ''
 
     if (action === 'enableMinting') {
-      endpoint = 'enableMinting';
-      processingMessage = 'Enabling minting...';
-      successMessage = 'Minting enabled successfully';
+      endpoint = 'enableMinting'
+      processingMessage = 'Enabling minting...'
+      successMessage = 'Minting enabled successfully'
     } else if (action === 'disableMinting') {
-      endpoint = 'disableMinting';
-      processingMessage = 'Disabling minting...';
-      successMessage = 'Minting disabled successfully';
+      endpoint = 'disableMinting'
+      processingMessage = 'Disabling minting...'
+      successMessage = 'Minting disabled successfully'
     } else {
-      console.error('Unknown action');
-      return;
+      console.error('Unknown action')
+      return
     }
 
-    const hexArguments = `${endpoint}`;
+    const hexArguments = `${endpoint}`
 
     const transaction = newTransaction({
       value: 0,
@@ -157,7 +159,7 @@ export default function CollectionManager({ collectionAddress }: { collectionAdd
       sender: new Address(connectedAddress),
       version: VERSION,
       arguments: []
-    });
+    })
 
     try {
       const sessionId = await signAndSendTransactions({
@@ -168,17 +170,17 @@ export default function CollectionManager({ collectionAddress }: { collectionAdd
           errorMessage: 'Action failed',
           successMessage,
         }
-      });
+      })
 
-      console.log(`Action completed, session ID:`, sessionId);
+      console.log(`Action completed, session ID:`, sessionId)
     } catch (error) {
-      console.error('Action failed:', error);
+      console.error('Action failed:', error)
     }
   }
 
   const handleSeeMintPage = () => {
-    router.push(`/collections?select=${collectionAddress}`);
-  };
+    router.push(`/collections?select=${collectionAddress}`)
+  }
 
   if (loading) {
     return <div className="flex justify-center items-center h-screen bg-gray-950">
@@ -287,15 +289,15 @@ export default function CollectionManager({ collectionAddress }: { collectionAdd
                     <div key={index} className="flex items-center space-x-2 mt-2">
                       <Input
                         placeholder="Token Identifier"
-                        value={cost.tokenIdentifier}
-                        onChange={(e) => handleCostChange(index, 'tokenIdentifier', e.target.value)}
+                        value={cost.token.toString()}
+                        onChange={(e) => handleCostChange(index, 'token', e.target.value)}
                         className="bg-gray-700 text-white border-gray-600"
                       />
                       <Input
                         type="number"
                         step="0.000000000000000001"
                         placeholder="Amount"
-                        value={cost.amount}
+                        value={cost.amount.toString()}
                         onChange={(e) => handleCostChange(index, 'amount', e.target.value)}
                         className="bg-gray-700 text-white border-gray-600"
                       />
@@ -349,7 +351,7 @@ export default function CollectionManager({ collectionAddress }: { collectionAdd
               </CardHeader>
               <CardContent>
                 <form onSubmit={(e) => {
-                  e.preventDefault();
+                  e.preventDefault()
                   // Handle form submission here
                 }} className="space-y-4">
                   <div>
