@@ -40,7 +40,6 @@ export const Header = () => {
   const menuItems = [
     { label: 'Home', route: RouteNamesEnum.home },
     { label: 'Dashboard', route: RouteNamesEnum.dashboard },
-    { label: 'Manager', route: RouteNamesEnum.manager },
     { label: 'Collections', route: RouteNamesEnum.collections },
   ];
 
