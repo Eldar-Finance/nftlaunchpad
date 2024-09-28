@@ -73,7 +73,7 @@ export default function SingleCollectionMint({ collectionId, onBackClick }: Sing
   };
 
   const handleMint = () => {
-    console.log(`Minting ${mintAmount} NFTs from collection ${collectionId} with token ${selectedToken}`);
+    // console.log(`Minting ${mintAmount} NFTs from collection ${collectionId} with token ${selectedToken}`);
     // Implement minting logic here
   };
 

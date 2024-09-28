@@ -33,9 +33,9 @@ interface Metadata {
 
 const validateIpfsCid = async (cid: string) => {
   try {
-    console.log(`Validating CID: ${cid}`);
+    // console.log(`Validating CID: ${cid}`);
     const isValid = /^Qm[a-zA-Z0-9]{44}$/.test(cid);
-    console.log(`CID: ${cid}, Valid: ${isValid}`);
+    // console.log(`CID: ${cid}, Valid: ${isValid}`);
     return isValid;
   } catch (error) {
     console.error('Error validating IPFS CID:', error);
@@ -97,14 +97,14 @@ export function CreateCollection({ onBack }: CreateCollectionProps) {
     setFormData(prev => ({ ...prev, [name]: value }))
 
     if (name === 'ipfsCid') {
-      console.log(`Inputting CID: ${value}`);
+      // console.log(`Inputting CID: ${value}`);
       const isValid = await validateIpfsCid(value);
       setIpfsValid(isValid);
       if (isValid) {
-        console.log(`Valid CID: ${value}`);
+        // console.log(`Valid CID: ${value}`);
         fetchIpfsData(value);
       } else {
-        console.log(`Invalid CID: ${value}`);
+        // console.log(`Invalid CID: ${value}`);
         setIpfsObjectCount(0);
       }
     }
@@ -166,7 +166,7 @@ export function CreateCollection({ onBack }: CreateCollectionProps) {
         const links = doc.querySelectorAll('a[href]');
 
         const totalFiles = links.length;
-        console.log(`Total number of files in the directory: ${totalFiles}`);
+        // console.log(`Total number of files in the directory: ${totalFiles}`);
 
         const imageExtensions = ['.jpg', '.jpeg', '.png', '.gif', '.bmp', '.svg'];
         const jsonExtension = '.json';
@@ -186,15 +186,15 @@ export function CreateCollection({ onBack }: CreateCollectionProps) {
           }
         });
 
-        console.log(`Number of image files: ${imageCount}`);
-        console.log(`Number of JSON files: ${jsonCount}`);
+        // console.log(`Number of image files: ${imageCount}`);
+        // console.log(`Number of JSON files: ${jsonCount}`);
 
         setIpfsObjectCount(totalFiles);
         setImageCount(imageCount);
         setJsonCount(jsonCount);
       } else {
         const data = JSON.parse(text);
-        console.log('Fetched IPFS Data:', data);
+        // console.log('Fetched IPFS Data:', data);
         const numberOfFiles = data.length;
         setIpfsObjectCount(numberOfFiles);
       }
@@ -220,7 +220,7 @@ export function CreateCollection({ onBack }: CreateCollectionProps) {
       console.error('Invalid royalties value');
       return;
     }
-    console.log('Collection created:', formData)
+    // console.log('Collection created:', formData)
     // Here you would typically send the data to your backend
   }
 
@@ -269,7 +269,7 @@ export function CreateCollection({ onBack }: CreateCollectionProps) {
             }
         });
 
-        console.log('Collection created, session ID:', sessionId);
+        // console.log('Collection created, session ID:', sessionId);
     } catch (error) {
         console.error('Collection creation failed:', error);
     }

@@ -26,7 +26,7 @@ export function CreateMinter({ onBack }: CreateMinterProps) {
   const { account } = useGetAccountInfo();
   const nonce = account.nonce;
   const minterInfo = useGetMinterInformation(connectedAddress);
-  console.log('Minter Information (Bech32):', minterInfo);
+  // console.log('Minter Information (Bech32):', minterInfo);
   const { collections } = useGetCollections(Array.isArray(minterInfo) ? minterInfo : []);
 
   const [selectedCollection, setSelectedCollection] = useState('')
@@ -69,7 +69,7 @@ export function CreateMinter({ onBack }: CreateMinterProps) {
             }
         });
 
-        console.log('Collection created, session ID:', sessionId);
+        // console.log('Collection created, session ID:', sessionId);
     } catch (error) {
         console.error('Collection creation failed:', error);
     }

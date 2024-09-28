@@ -35,7 +35,7 @@ function toEvenLengthHex(value: number | string): string {
   return hex.length % 2 ? '0' + hex : hex;
 }
 
-function toEvenLength(value: string): string {
+export function toEvenLength(value: string): string {
   return value.length % 2 ? '0' + value : value;
 }
 
