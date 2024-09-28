@@ -8,6 +8,7 @@ import { Input } from "@/components/ui/input"
 import { Progress } from "@/components/ui/progress"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Users, ArrowLeft, Coins, Percent, Plus, Minus } from 'lucide-react'
 
 import { useGetCollectionsInfo } from '@/hooks/useGetCollectionsInfo'
@@ -40,6 +41,7 @@ interface SingleCollectionMintProps {
 
 export default function SingleCollectionMint({ collectionId, onBackClick }: SingleCollectionMintProps) {
   const [mintAmount, setMintAmount] = useState(1)
+  const [selectedToken, setSelectedToken] = useState('')
   const [isHovered, setIsHovered] = useState(false)
   const [randomImageNumber, setRandomImageNumber] = useState(3)
   const controls = useAnimation()
@@ -49,7 +51,10 @@ export default function SingleCollectionMint({ collectionId, onBackClick }: Sing
 
   useEffect(() => {
     setRandomImageNumber(Math.floor(Math.random() * (7 - 3 + 1) + 3))
-  }, [])
+    if (collectionData && collectionData.mintCosts.length > 0) {
+      setSelectedToken(collectionData.mintCosts[0].tokenIdentifier)
+    }
+  }, [collectionData])
 
   useEffect(() => {
     controls.start({
@@ -64,13 +69,14 @@ export default function SingleCollectionMint({ collectionId, onBackClick }: Sing
   };
 
   const handleMint = () => {
-    console.log(`Minting ${mintAmount} NFTs from collection ${collectionId}`);
+    console.log(`Minting ${mintAmount} NFTs from collection ${collectionId} with token ${selectedToken}`);
     // Implement minting logic here
   };
 
   const incrementMintAmount = () => {
-    
-    setMintAmount(prev => prev + 1)
+    if (mintAmount < (collectionData?.maxAmountPerMint || 1)) {
+      setMintAmount(prev => prev + 1)
+    }
   }
 
   const decrementMintAmount = () => {
@@ -100,7 +106,8 @@ export default function SingleCollectionMint({ collectionId, onBackClick }: Sing
     return <div className="text-center text-2xl text-red-500">Collection not found</div>;
   }
 
-  const totalCost = formatPrice(collectionData.mintCosts.reduce((total, cost) => total + cost.amount, 0) * mintAmount);
+  const selectedCost = collectionData.mintCosts.find(cost => cost.tokenIdentifier === selectedToken);
+  const totalCost = selectedCost ? formatPrice(selectedCost.amount * mintAmount) : '0.00';
 
   const imageUrl = `https://ipfs.io/ipfs/${collectionData.ipfsCid}/${randomImageNumber}.${collectionData.fileEnding}`
 
@@ -148,13 +155,6 @@ export default function SingleCollectionMint({ collectionId, onBackClick }: Sing
                 className="w-full h-auto object-cover transition-transform duration-300 group-hover:scale-110 rounded-3xl"
               />
             </Card>
-            <motion.div
-              className="absolute inset-0 bg-gradient-to-t from-black to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end justify-center pb-8 rounded-3xl"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: isHovered ? 1 : 0 }}
-            >
-              
-            </motion.div>
           </motion.div>
         </motion.div>
 
@@ -186,10 +186,33 @@ export default function SingleCollectionMint({ collectionId, onBackClick }: Sing
               <div className="flex justify-between items-center">
                 <div className="flex items-center">
                   <Coins className="w-6 h-6 mr-2 text-yellow-400" />
-                  <span className="text-white text-lg">Mint Price</span>
+                  <span className="text-white text-lg">Mint Token</span>
                 </div>
+                <Select value={selectedToken} onValueChange={setSelectedToken}>
+                  <SelectTrigger className="w-[180px]">
+                    <SelectValue placeholder="Select token" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {collectionData.mintCosts.map((cost) => (
+                      <SelectItem key={cost.tokenIdentifier} value={cost.tokenIdentifier}>
+                        <div className="flex items-center">
+                          <img 
+                            src={`https://devnet-api.multiversx.com/${cost.tokenIdentifier}/logo/png`} 
+                            alt={cost.tokenIdentifier}
+                            className="w-6 h-6 mr-2"
+                          />
+                          {cost.tokenIdentifier}
+                        </div>
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="flex justify-between items-center">
+                <span className="text-white text-lg">Mint Price</span>
                 <span className="text-white text-lg font-bold">
-                  {collectionData.mintCosts.map(cost => `${formatPrice(cost.amount)} ${cost.tokenIdentifier}`).join(', ')}
+                  {selectedCost ? `${formatPrice(selectedCost.amount)} ${selectedToken}` : 'Select a token'}
                 </span>
               </div>
 
@@ -204,7 +227,7 @@ export default function SingleCollectionMint({ collectionId, onBackClick }: Sing
                   <Input 
                     type="number" 
                     min={1} 
-                    //max={collectionData.maxAmountPerMint}
+                    max={collectionData.maxAmountPerMint}
                     value={mintAmount} 
                     onChange={handleInputChange}
                     className="w-16 bg-transparent text-white border-0 text-center text-lg [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
@@ -218,15 +241,15 @@ export default function SingleCollectionMint({ collectionId, onBackClick }: Sing
                 </div>
                 <Button 
                   onClick={handleMint}
-                  disabled={!collectionData.isMintingEnabled}
-                  className={`bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white text-lg px-8 py-6 rounded-full transition-all duration-300 transform hover:scale-105 ${!collectionData.isMintingEnabled ? 'opacity-50 cursor-not-allowed' : ''}`}
+                  disabled={!collectionData.isMintingEnabled || !selectedToken}
+                  className={`bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white text-lg px-8 py-6 rounded-full transition-all duration-300 transform hover:scale-105 ${(!collectionData.isMintingEnabled || !selectedToken) ? 'opacity-50 cursor-not-allowed' : ''}`}
                 >
                   Mint Now
                 </Button>
               </div>
 
               <p className="text-lg text-gray-300">
-                Total Cost: {totalCost} {collectionData.mintCosts[0]?.tokenIdentifier || ''}
+                Total Cost: {totalCost} {selectedToken}
               </p>
             </CardContent>
           </Card>
