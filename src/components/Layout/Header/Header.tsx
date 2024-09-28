@@ -6,7 +6,7 @@ import { environment } from '@/config';
 import { logout } from '@/helpers';
 import { useGetIsLoggedIn } from '@/hooks';
 import { RouteNamesEnum } from '@/localConstants';
-import mvxLogo from '../../../../public/assets/img/multiversx-logo.svg';
+import mvxLogo from '../../../../public/assets/img/multiversx-symbol.svg';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { getWindowLocation } from '@/utils/sdkDappUtils';
