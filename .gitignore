@@ -48,3 +48,5 @@ yalc.lock
 cypress/reports/
 cypress/screenshots/
 cypress/videos/
+
+yarn.lock
