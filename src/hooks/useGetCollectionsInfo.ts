@@ -28,6 +28,14 @@ interface CollectionInfo {
   isMintingEnabled: boolean;
   isPaused: boolean;
   mintCosts: { tokenIdentifier: string; amount: number }[];
+  phaseName: string;
+  phaseId: number;
+  userMaxMints: number;
+  userMinted: number;
+  maxMints: number;
+  minted: number;
+  isPhaseWlOnly: boolean;
+  canUserTryToMint: boolean;
 }
 
 export const useGetCollectionsInfo = (collectionAddresses: string[]) => {
@@ -72,14 +80,22 @@ export const useGetCollectionsInfo = (collectionAddresses: string[]) => {
             ipfsCid: hexToString(decodedData[6]),
             fileEnding: hexToString(decodedData[7]),
             tags: hexToString(decodedData[8]),
-            royalties: hexToDecimal(decodedData[9]) ,
-            maxSupply: hexToDecimal(decodedData[10]),
-            maxAmountPerMint: hexToDecimal(decodedData[11]),
-            totalNftsMinted: hexToDecimal(decodedData[12]),
-            hasJsonMetadata: decodedData[13] === '01',
-            isMintingEnabled: decodedData[14] === '01',
-            isPaused: decodedData[15] === '01',
-            mintCosts: decodedData.slice(16).map((cost, index, array) => {
+            phaseName: hexToString(decodedData[9]),
+            royalties: hexToDecimal(decodedData[10]),
+            totalNftsMinted: hexToDecimal(decodedData[11]),
+            maxSupply: hexToDecimal(decodedData[12]),
+            maxAmountPerMint: hexToDecimal(decodedData[13]),
+            phaseId: hexToDecimal(decodedData[14]),
+            userMaxMints: hexToDecimal(decodedData[15]),
+            userMinted: hexToDecimal(decodedData[16]),
+            maxMints: hexToDecimal(decodedData[17]),
+            minted: hexToDecimal(decodedData[18]),
+            hasJsonMetadata: decodedData[19] === '01',
+            isMintingEnabled: decodedData[20] === '01',
+            isPaused: decodedData[21] === '01',
+            isPhaseWlOnly: decodedData[22] === '01',
+            canUserTryToMint: decodedData[23] === '01',
+            mintCosts: decodedData.slice(24).map((cost, index, array) => {
                 if (index % 2 === 0) {
                     return {
                         tokenIdentifier: hexToString(cost),

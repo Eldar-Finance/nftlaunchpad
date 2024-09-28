@@ -298,8 +298,7 @@
                 },
                 {
                     "name": "costs",
-                    "type": "variadic<multi<EgldOrEsdtTokenIdentifier,BigUint>>",
-                    "multi_arg": true
+                    "type": "List<Cost>"
                 },
                 {
                     "name": "whitelisted_users",
@@ -307,8 +306,7 @@
                     "multi_arg": true
                 }
             ],
-            "outputs": [],
-            "allow_multiple_var_args": true
+            "outputs": []
         },
         {
             "name": "claimRoyalties",
@@ -528,6 +526,22 @@
             "outputs": []
         },
         {
+            "name": "getManagedInput",
+            "mutability": "readonly",
+            "inputs": [
+                {
+                    "name": "costs",
+                    "type": "variadic<multi<EgldOrEsdtTokenIdentifier,BigUint>>",
+                    "multi_arg": true
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "List<Cost>"
+                }
+            ]
+        },
+        {
             "name": "getIsMintingEnabled",
             "mutability": "readonly",
             "inputs": [],
@@ -576,7 +590,6 @@
                 "    - Total minted (overall)",
                 "    - Max supply",
                 "    - Max amount per tranascation (generic prerequisite)",
-                "    - Total NFTs minted",
                 "    - Phase ID",
                 "    - User max mints",
                 "    - User minted",

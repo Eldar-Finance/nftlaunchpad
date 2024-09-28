@@ -8,7 +8,7 @@ import { Label } from "@/components/ui/label"
 import { 
   Tag, Image as ImageIcon, Hash, DollarSign, 
   LayoutGrid, Users, Pause, Play, RefreshCw,
- Fingerprint, CheckCircle, XCircle
+ Fingerprint, CheckCircle, XCircle, Plus, Minus
 } from 'lucide-react'
 import { useGetCollectionsInfo } from '@/hooks/useGetCollectionsInfo'
 import { Address } from '@multiversx/sdk-core/out';
@@ -20,14 +20,109 @@ import {
 } from '@/hooks/sdkDappHooks';
 import { GAS_PRICE, VERSION } from '@/localConstants';
 import { useRouter } from 'next/navigation';
+import { useState } from 'react'
+import { Input } from "@/components/ui/input"
+import { Textarea } from "@/components/ui/textarea"
+import { BytesValue } from '@multiversx/sdk-core/out';
 
 export default function CollectionManager({ collectionAddress }: { collectionAddress: string }) {
   const { collectionsInfo, loading } = useGetCollectionsInfo([collectionAddress]);
+
+  console.log(collectionsInfo)
   const { account } = useGetAccountInfo();
   const nonce = account.nonce;
   const { network } = useGetNetworkConfig();
   const { address: connectedAddress } = useGetAccountInfo();
   const router = useRouter();
+
+  const [phaseName, setPhaseName] = useState('')
+  const [userMaxMints, setUserMaxMints] = useState('')
+  const [maxMints, setMaxMints] = useState('')
+  const [costs, setCosts] = useState([{ tokenIdentifier: '', amount: '' }])
+  const [whitelist, setWhitelist] = useState('')
+
+  const handleAddCost = () => {
+    setCosts([...costs, { tokenIdentifier: '', amount: '' }])
+  }
+
+  const handleRemoveCost = (index: number) => {
+    const newCosts = costs.filter((_, i) => i !== index)
+    setCosts(newCosts)
+  }
+
+  const handleCostChange = (index: number, field: 'tokenIdentifier' | 'amount', value: string) => {
+    const newCosts = costs.map((cost, i) => {
+      if (i === index) {
+        return { ...cost, [field]: value }
+      }
+      return cost
+    })
+    setCosts(newCosts)
+  }
+
+  const handleCreatePhase = async (e: React.FormEvent) => {
+    e.preventDefault()
+
+    // Convert phase name to hex
+    const phaseNameHex = Buffer.from(phaseName).toString('hex');
+
+    // Convert user max mints and max mints to hex
+    const userMaxMintsHex = parseInt(userMaxMints).toString(16).padStart(16, '0');
+    const maxMintsHex = parseInt(maxMints).toString(16).padStart(16, '0');
+
+    // Format costs
+    const costsString = costs.map(cost => {
+      const amountDec = (parseFloat(cost.amount) * 1e18).toFixed(0); // Ensure no decimal places
+      return `{token:${cost.tokenIdentifier},amount:${amountDec}}`;
+    }).join(',');
+
+    const costsBytes = BytesValue.fromUTF8(`[${costsString}]`);
+    const costsHex = Buffer.from(costsBytes.toString()).toString('hex');
+
+    // Format whitelist
+    const whitelistAddresses = whitelist
+      .split('\n')
+      .map(address => address.trim())
+      .filter(address => address.startsWith('erd'));
+
+    // Construct the hex arguments
+    let hexArguments = `startPhase@${phaseNameHex}@${userMaxMintsHex}@${maxMintsHex}@${costsHex}`;
+
+    // Add whitelist addresses if any
+    if (whitelistAddresses.length > 0) {
+      const whitelistHex = whitelistAddresses.map(address => Buffer.from(address).toString('hex')).join('@');
+      hexArguments += `@${whitelistHex}`;
+    }
+
+    console.log(hexArguments)
+
+    const transaction = newTransaction({
+      value: 0,
+      data: hexArguments,
+      receiver: collectionAddress,
+      gasLimit: 60000000,
+      gasPrice: GAS_PRICE,
+      chainID: network.chainId,
+      nonce: nonce,
+      sender: new Address(connectedAddress),
+      version: VERSION,
+    });
+
+    try {
+      const sessionId = await signAndSendTransactions({
+        transactions: [transaction],
+        callbackRoute: '',
+        transactionsDisplayInfo: {
+          processingMessage: 'Creating new phase...',
+          errorMessage: 'Failed to create phase',
+          successMessage: 'Phase created successfully',
+        }
+      });
+      console.log(`Phase created, session ID:`, sessionId);
+    } catch (error) {
+      console.error('Failed to create phase:', error);
+    }
+  }
 
   const handleAction = async (action: string) => {
     console.log(`Performing action: ${action} on collection: ${collectionAddress}`)
@@ -130,7 +225,7 @@ export default function CollectionManager({ collectionAddress }: { collectionAdd
             <InfoCard
               icon={<Users className="w-5 h-5 text-yellow-400" />}
               label="Max Per Mint"
-              value={isNaN(info.maxAmountPerMint) ? "-" : info.maxAmountPerMint.toString()}
+              value={info.maxAmountPerMint?.toString() || "-"}
             />
             <InfoCard
               icon={<ImageIcon className="w-5 h-5 text-purple-400" />}
@@ -143,6 +238,93 @@ export default function CollectionManager({ collectionAddress }: { collectionAdd
               value={info.singleNftName}
             />
           </div>
+
+          <Card className="bg-gray-800 border-gray-700">
+            <CardHeader>
+              <CardTitle className="text-xl font-semibold text-white">Create New Phase</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <form onSubmit={handleCreatePhase} className="space-y-4">
+                <div>
+                  <Label htmlFor="phaseName">Phase Name (max 50 characters)</Label>
+                  <Input
+                    id="phaseName"
+                    value={phaseName}
+                    onChange={(e) => setPhaseName(e.target.value.slice(0, 50))}
+                    maxLength={50}
+                    className="bg-gray-700 text-white border-gray-600"
+                  />
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <Label htmlFor="userMaxMints">User Max Mints</Label>
+                    <Input
+                      id="userMaxMints"
+                      type="number"
+                      min="1"
+                      step="1"
+                      value={userMaxMints}
+                      onChange={(e) => setUserMaxMints(e.target.value)}
+                      className="bg-gray-700 text-white border-gray-600"
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="maxMints">Max Mints</Label>
+                    <Input
+                      id="maxMints"
+                      type="number"
+                      min="1"
+                      step="1"
+                      value={maxMints}
+                      onChange={(e) => setMaxMints(e.target.value)}
+                      className="bg-gray-700 text-white border-gray-600"
+                    />
+                  </div>
+                </div>
+                <div>
+                  <Label>Costs</Label>
+                  {costs.map((cost, index) => (
+                    <div key={index} className="flex items-center space-x-2 mt-2">
+                      <Input
+                        placeholder="Token Identifier"
+                        value={cost.tokenIdentifier}
+                        onChange={(e) => handleCostChange(index, 'tokenIdentifier', e.target.value)}
+                        className="bg-gray-700 text-white border-gray-600"
+                      />
+                      <Input
+                        type="number"
+                        step="0.000000000000000001"
+                        placeholder="Amount"
+                        value={cost.amount}
+                        onChange={(e) => handleCostChange(index, 'amount', e.target.value)}
+                        className="bg-gray-700 text-white border-gray-600"
+                      />
+                      <Button type="button" onClick={() => handleRemoveCost(index)} className="bg-red-600 hover:bg-red-700">
+                        <Minus className="w-4 h-4" />
+                      </Button>
+                    </div>
+                  ))}
+                  <Button type="button" onClick={handleAddCost} className="mt-2 bg-green-600 hover:bg-green-700">
+                    <Plus className="w-4 h-4 mr-2" /> Add Cost
+                  </Button>
+                </div>
+                <div>
+                  <Label htmlFor="whitelist">Whitelist (one address per line)</Label>
+                  <Textarea
+                    id="whitelist"
+                    value={whitelist}
+                    onChange={(e) => setWhitelist(e.target.value)}
+                    className="bg-gray-700 text-white border-gray-600"
+                    placeholder="erd1..."
+                    rows={5}
+                  />
+                </div>
+                <Button type="submit" className="w-full bg-blue-600 hover:bg-blue-700">
+                  Create Phase
+                </Button>
+              </form>
+            </CardContent>
+          </Card>
 
           <div className="flex flex-col md:flex-row gap-6">
             <Card className="bg-gray-800 border-gray-700 flex-1">
