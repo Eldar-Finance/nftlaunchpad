@@ -8,7 +8,7 @@ import { Input } from "@/components/ui/input"
 import { Progress } from "@/components/ui/progress"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Users, Image as ArrowLeft, Coins, Percent } from 'lucide-react'
+import { Users, ArrowLeft, Coins, Percent, Plus, Minus } from 'lucide-react'
 
 import { useGetCollectionsInfo } from '@/hooks/useGetCollectionsInfo'
 
@@ -48,7 +48,6 @@ export default function SingleCollectionMint({ collectionId, onBackClick }: Sing
   const collectionData: CollectionInfo | undefined = collectionsInfo[0];
 
   useEffect(() => {
-    // Generate a random number between 3 and 7 when the component mounts
     setRandomImageNumber(Math.floor(Math.random() * (7 - 3 + 1) + 3))
   }, [])
 
@@ -69,12 +68,36 @@ export default function SingleCollectionMint({ collectionId, onBackClick }: Sing
     // Implement minting logic here
   };
 
+  const incrementMintAmount = () => {
+    
+    setMintAmount(prev => prev + 1)
+  }
+
+  const decrementMintAmount = () => {
+    if (mintAmount > 1) {
+      setMintAmount(prev => prev - 1)
+    }
+  }
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = parseInt(e.target.value);
+    if (!isNaN(value) && value >= 1 && value <= (collectionData?.maxAmountPerMint || 1)) {
+      setMintAmount(value);
+    }
+  }
+
   if (loading) {
-    return <div>Loading...</div>;
+    return <div className="flex justify-center items-center h-screen">
+      <motion.div
+        animate={{ rotate: 360 }}
+        transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}
+        className="w-16 h-16 border-t-4 border-blue-500 border-solid rounded-full"
+      />
+    </div>
   }
 
   if (!collectionData) {
-    return <div>Collection not found</div>;
+    return <div className="text-center text-2xl text-red-500">Collection not found</div>;
   }
 
   const totalCost = formatPrice(collectionData.mintCosts.reduce((total, cost) => total + cost.amount, 0) * mintAmount);
@@ -82,22 +105,9 @@ export default function SingleCollectionMint({ collectionId, onBackClick }: Sing
   const imageUrl = `https://ipfs.io/ipfs/${collectionData.ipfsCid}/${randomImageNumber}.${collectionData.fileEnding}`
 
   return (
-    <div className="min-h-screen bg-transparent text-gray-200 p-8 overflow-hidden">
+    <div className="min-h-screen bg-gradient-to-b from-gray-900 to-black text-gray-200 p-8 overflow-hidden">
       <motion.div 
-        className="absolute top-0 left-0 w-full h-full opacity-50 pointer-events-none"
-        animate={{
-          backgroundPosition: ['0% 0%', '100% 100%'],
-          backgroundSize: ['100% 100%', '200% 200%'],
-        }}
-        transition={{ repeat: Infinity, duration: 20, ease: 'linear' }}
-        style={{
-          backgroundImage: 'radial-gradient(circle, #1a1b2e 10%, transparent 10%), radial-gradient(circle, #1a1b2e 10%, transparent 10%)',
-          backgroundSize: '50px 50px',
-        }}
-      />
-
-      <motion.div 
-        className="flex items-center justify-between mb-8"
+        className="flex items-center justify-between mb-12"
         initial={{ opacity: 0, y: -50 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
@@ -129,23 +139,21 @@ export default function SingleCollectionMint({ collectionId, onBackClick }: Sing
             animate={controls}
             onHoverStart={() => setIsHovered(true)}
             onHoverEnd={() => setIsHovered(false)}
-            className="relative group w-1/2"
+            className="relative group w-full max-w-md"
           >
-            <Card className="bg-gray-800 border-gray-700 overflow-hidden">
+            <Card className="bg-gradient-to-br from-gray-800 to-gray-900 border-gray-700 overflow-hidden rounded-3xl shadow-2xl">
               <img 
                 src={imageUrl}
                 alt={collectionData.collectionName} 
-                className="w-full h-auto object-cover transition-transform duration-300 group-hover:scale-110"
+                className="w-full h-auto object-cover transition-transform duration-300 group-hover:scale-110 rounded-3xl"
               />
             </Card>
             <motion.div
-              className="absolute inset-0 bg-gradient-to-t from-black to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end justify-center pb-8"
+              className="absolute inset-0 bg-gradient-to-t from-black to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end justify-center pb-8 rounded-3xl"
               initial={{ opacity: 0 }}
               animate={{ opacity: isHovered ? 1 : 0 }}
             >
-              <Button className="bg-white text-black hover:bg-gray-200 transition-colors">
-                View Gallery
-              </Button>
+              
             </motion.div>
           </motion.div>
         </motion.div>
@@ -156,17 +164,17 @@ export default function SingleCollectionMint({ collectionId, onBackClick }: Sing
           transition={{ duration: 0.5 }}
           className="space-y-8 w-full"
         >
-          <Card className="bg-gray-800/50 border-gray-700 backdrop-blur-md w-full">
-            <CardContent className="p-6 space-y-6">
+          <Card className="bg-gradient-to-br from-gray-800 to-gray-900 border-gray-700 backdrop-blur-md w-full rounded-3xl shadow-2xl">
+            <CardContent className="p-8 space-y-6">
               <div className="flex justify-between items-center">
-                <div className="flex items-center">
+                <div className="flex items-center mt-6">
                   <Users className="w-6 h-6 mr-2 text-blue-400" />
                   <span className="text-white text-lg">{collectionData.totalNftsMinted} / {collectionData.maxSupply} Minted</span>
                 </div>
                 <TooltipProvider>
                   <Tooltip>
                     <TooltipTrigger>
-                      <Progress value={(collectionData.totalNftsMinted / collectionData.maxSupply) * 100} className="w-32 h-2" />
+                      <Progress value={(collectionData.totalNftsMinted / collectionData.maxSupply) * 100} className="w-32 h-3 rounded-full" />
                     </TooltipTrigger>
                     <TooltipContent side="top">
                       <p className="text-white">{((collectionData.totalNftsMinted / collectionData.maxSupply) * 100).toFixed(1)}% minted</p>
@@ -185,23 +193,29 @@ export default function SingleCollectionMint({ collectionId, onBackClick }: Sing
                 </span>
               </div>
 
-              <div className="flex justify-between items-center">
-                <div className="flex items-center">
-                  <Percent className="w-6 h-6 mr-2 text-green-400" />
-                  <span className="text-white text-lg">Royalties</span>
-                </div>
-                <span className="text-white text-lg font-bold">{(collectionData.royalties / 100).toFixed(2)}%</span>
-              </div>
-
               <div className="flex items-center space-x-4">
-                <Input 
-                  type="number" 
-                  min="1" 
-                  max={collectionData.maxAmountPerMint}
-                  value={mintAmount} 
-                  onChange={(e) => setMintAmount(Number(e.target.value))}
-                  className="w-24 bg-gray-700 text-white border-gray-600 text-lg"
-                />
+                <div className="flex items-center bg-gray-700 rounded-full">
+                  <Button 
+                    onClick={decrementMintAmount}
+                    className="bg-transparent hover:bg-gray-600 text-white rounded-l-full px-3"
+                  >
+                    <Minus className="w-4 h-4" />
+                  </Button>
+                  <Input 
+                    type="number" 
+                    min={1} 
+                    //max={collectionData.maxAmountPerMint}
+                    value={mintAmount} 
+                    onChange={handleInputChange}
+                    className="w-16 bg-transparent text-white border-0 text-center text-lg [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                  />
+                  <Button 
+                    onClick={incrementMintAmount}
+                    className="bg-transparent hover:bg-gray-600 text-white rounded-r-full px-3"
+                  >
+                    <Plus className="w-4 h-4" />
+                  </Button>
+                </div>
                 <Button 
                   onClick={handleMint}
                   disabled={!collectionData.isMintingEnabled}
@@ -217,42 +231,47 @@ export default function SingleCollectionMint({ collectionId, onBackClick }: Sing
             </CardContent>
           </Card>
 
-          <Tabs defaultValue="description" className="w-full">
-            <TabsList className="grid w-full grid-cols-2">
-              <TabsTrigger value="description">Description</TabsTrigger>
-              <TabsTrigger value="details">Details</TabsTrigger>
-            </TabsList>
-            <TabsContent value="description">
-              <Card className="bg-gray-800/50 border-gray-700 backdrop-blur-md">
-                <CardContent className="p-6">
-                  <p className="text-white">{collectionData.description}</p>
-                </CardContent>
-              </Card>
-            </TabsContent>
-            <TabsContent value="details">
-              <Card className="bg-gray-800/50 border-gray-700 backdrop-blur-md">
-                <CardContent className="p-6 space-y-4">
-                  <div className="flex justify-between">
+          <Card className="bg-gradient-to-br from-gray-800 to-gray-900 border-gray-700 backdrop-blur-md rounded-3xl shadow-2xl overflow-hidden">
+            <Tabs defaultValue="description" className="w-full">
+              <TabsList className="grid w-full grid-cols-2 bg-gray-900 p-1 rounded-t-3xl">
+                <TabsTrigger value="description" className="rounded-2xl">Description</TabsTrigger>
+                <TabsTrigger value="details" className="rounded-2xl">Details</TabsTrigger>
+              </TabsList>
+              <TabsContent value="description" className="p-6">
+                <p className="text-white">{collectionData.description}</p>
+              </TabsContent>
+              <TabsContent value="details" className="p-6 space-y-4">
+                <div className="flex justify-between items-center">
+                  <div className="flex items-center">
+                    <Users className="w-5 h-5 mr-2 text-blue-400" />
                     <span className="text-gray-400">Creator</span>
-                    <span className="text-white">{collectionData.creatorAddress}</span>
                   </div>
-                  <div className="flex justify-between">
+                  <span className="text-white">{collectionData.creatorAddress.slice(0, 6)}...{collectionData.creatorAddress.slice(-4)}</span>
+                </div>
+                <div className="flex justify-between items-center">
+                  <div className="flex items-center">
+                    <Coins className="w-5 h-5 mr-2 text-yellow-400" />
                     <span className="text-gray-400">Ticker</span>
-                    <span className="text-white">{collectionData.ticker}</span>
                   </div>
-                  <div className="flex justify-between">
+                  <span className="text-white">{collectionData.ticker}</span>
+                </div>
+                <div className="flex justify-between items-center">
+                  <div className="flex items-center">
+                    <Users className="w-5 h-5 mr-2 text-green-400" />
                     <span className="text-gray-400">Max Amount Per Mint</span>
-                    <span className="text-white">{collectionData.maxAmountPerMint}</span>
                   </div>
-                  <div className="flex justify-between">
-                    <span className="text-gray-400">Minting Enabled</span>
-                    <span className="text-white">{collectionData.isMintingEnabled ? 'Yes' : 'No'}</span>
+                  <span className="text-white">{collectionData.maxAmountPerMint}</span>
+                </div>
+                <div className="flex justify-between items-center">
+                  <div className="flex items-center">
+                    <Percent className="w-5 h-5 mr-2 text-purple-400" />
+                    <span className="text-gray-400">Royalties</span>
                   </div>
-                  {/* Removed the Paused field */}
-                </CardContent>
-              </Card>
-            </TabsContent>
-          </Tabs>
+                  <span className="text-white">{(collectionData.royalties / 100).toFixed(2)}%</span>
+                </div>
+              </TabsContent>
+            </Tabs>
+          </Card>
         </motion.div>
       </div>
     </div>

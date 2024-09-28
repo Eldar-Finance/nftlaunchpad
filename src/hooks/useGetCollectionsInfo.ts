@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { useGetNetworkConfig } from '@/hooks';
 import {
   ContractFunction,
+  Address
 } from '@multiversx/sdk-core';
 import {
     ProxyNetworkProvider,
@@ -62,7 +63,7 @@ export const useGetCollectionsInfo = (collectionAddresses: string[]) => {
           // Construct the collection info object
           const collectionInfo: CollectionInfo = {
             address,
-            creatorAddress: hexToString(decodedData[0]),
+            creatorAddress: Address.fromHex(decodedData[0]).bech32(),
             collectionIdentifier: hexToString(decodedData[1]),
             collectionName: hexToString(decodedData[2]),
             singleNftName: hexToString(decodedData[3]),
