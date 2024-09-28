@@ -248,7 +248,7 @@ export function CreateCollection({ onBack }: CreateCollectionProps) {
     const createCollectionTransaction = newTransaction({
         value: 0,
         data: hexArguments,
-        receiver: "erd1qqqqqqqqqqqqqpgqq0hej0p0smnn8ddpshaa903778nnh6pwu7zstg8c0x",
+        receiver: "erd1qqqqqqqqqqqqqpgq0vct9qkqcnr0vgj8hsvdmufzxy9nevppu7zs8qzs0r",
         gasLimit: 20000000,
         gasPrice: GAS_PRICE,
         chainID: network.chainId,
