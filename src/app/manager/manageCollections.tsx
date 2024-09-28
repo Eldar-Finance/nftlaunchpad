@@ -10,7 +10,7 @@ import {
  Fingerprint, CheckCircle, XCircle, Plus, Minus
 } from 'lucide-react'
 import { useGetCollectionsInfo } from '@/hooks/useGetCollectionsInfo'
-import { Address, TokenIdentifierValue } from '@multiversx/sdk-core/out'
+import { Address, AddressValue, TokenIdentifierValue } from '@multiversx/sdk-core/out'
 import { newTransaction } from '@/helpers/sdkDappHelpers'
 import { signAndSendTransactions } from '@/helpers/signAndSendTransactions'
 import {
@@ -92,11 +92,9 @@ export default function CollectionManager({ collectionAddress }: { collectionAdd
 
     // Add whitelist addresses if any
     if (whitelistAddresses.length > 0) {
-      const whitelistHex = whitelistAddresses.map(address => Buffer.from(address).toString('hex')).join('@')
+      const whitelistHex = whitelistAddresses.map(address => new Address(address).hex()).join('@')
       hexArguments += `@${whitelistHex}`
     }
-
-    console.log(hexArguments)
 
     const transaction = newTransaction({
       value: 0,
