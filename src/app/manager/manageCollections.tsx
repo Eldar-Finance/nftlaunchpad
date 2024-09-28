@@ -10,7 +10,7 @@ import {
  Fingerprint, CheckCircle, XCircle, Plus, Minus
 } from 'lucide-react'
 import { useGetCollectionsInfo } from '@/hooks/useGetCollectionsInfo'
-import { Address, AddressValue, TokenIdentifierValue } from '@multiversx/sdk-core/out'
+import { Address, AddressValue, BigUIntValue, TokenIdentifierValue } from '@multiversx/sdk-core/out'
 import { newTransaction } from '@/helpers/sdkDappHelpers'
 import { signAndSendTransactions } from '@/helpers/signAndSendTransactions'
 import {
@@ -30,9 +30,13 @@ interface Cost {
   amount: BigNumber
 }
 
-function toEvenLengthHex(value: number): string {
+function toEvenLengthHex(value: number | string): string {
   let hex = value.toString(16);
   return hex.length % 2 ? '0' + hex : hex;
+}
+
+function toEvenLength(value: string): string {
+  return value.length % 2 ? '0' + value : value;
 }
 
 export default function CollectionManager({ collectionAddress }: { collectionAddress: string }) {
@@ -80,12 +84,26 @@ export default function CollectionManager({ collectionAddress }: { collectionAdd
 
     // Format costs
     const costsHex = costs.map(cost => {
-      const tokenLengthHex = cost.token.toString().length.toString(16).padStart(8, '0')
-      const tokenHex = Buffer.from(cost.token.toString()).toString('hex')
-      const amountLengthHex = cost.amount.toString().length.toString(16).padStart(8, '0')
-      const amountHex = cost.amount.times(1e18).integerValue().toString(16).padStart(16, '0')
+      const tokenHex = Buffer.from(cost.token.toString()).toString('hex');
+      console.log('⚠️ ~ tokenHex:', tokenHex);
+      
+      const tokenLength = toEvenLengthHex(tokenHex.length/2);
+      console.log('⚠️ ~ tokenLength:', tokenLength);
+
+      const tokenLengthHex = tokenLength.toString().padStart(8 - Number(tokenLength.toString().length), '0')
+      console.log('⚠️ ~ tokenLengthHex:', tokenLengthHex);
+ 
+      const amountHex = toEvenLength(cost.amount.times(1e18).integerValue().toString(16));
+      console.log('⚠️ ~ amountHex:', amountHex);
+ 
+      const amountLength = toEvenLengthHex(amountHex.length/2);
+      console.log('⚠️ ~ amountLength:', amountLength);
+
+      const amountLengthHex =  toEvenLengthHex(amountLength.toString().padStart(16 - Number(amountLength.toString().length), '0'))
+      console.log('⚠️ ~ amountLengthHex:', amountLengthHex);
       return `${tokenLengthHex}${tokenHex}${amountLengthHex}${amountHex}`
     }).join('')
+    console.log('⚠️ ~ costsHex:', costsHex);
 
     // Construct the hex arguments
     let hexArguments = `startPhase@${phaseNameHex}@${userMaxMintsHex}@${maxMintsHex}@${costsHex}`
