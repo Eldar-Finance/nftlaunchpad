@@ -11,7 +11,6 @@ import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { getWindowLocation } from '@/utils/sdkDappUtils';
 import { usePathname } from 'next/navigation';
-import { Power, LogIn, Home, LayoutDashboard, Settings,DollarSign } from 'lucide-react';
 
 export const Header = () => {
   const router = useRouter();
@@ -23,7 +22,6 @@ export const Header = () => {
   const ConnectButton = isUnlockRoute ? null : (
     <MxLink to={RouteNamesEnum.unlock}>
       <Button variant="outline" size="sm" className="text-gray-200 border-gray-700 hover:bg-gray-800 hover:text-white transition-colors">
-        <LogIn className="w-4 h-4 mr-2" />
         Connect
       </Button>
     </MxLink>
@@ -40,10 +38,10 @@ export const Header = () => {
   };
 
   const menuItems = [
-    { icon: Home, label: 'Home', route: RouteNamesEnum.home },
-    { icon: LayoutDashboard, label: 'Dashboard', route: RouteNamesEnum.dashboard },
-    { icon: Settings, label: 'Manager', route: RouteNamesEnum.manager },
-    { icon: DollarSign, label: 'Collections', route: RouteNamesEnum.collections },
+    { label: 'Home', route: RouteNamesEnum.home },
+    { label: 'Dashboard', route: RouteNamesEnum.dashboard },
+    { label: 'Manager', route: RouteNamesEnum.manager },
+    { label: 'Collections', route: RouteNamesEnum.collections },
   ];
 
   return (
@@ -62,13 +60,12 @@ export const Header = () => {
         {menuItems.map((item) => (
           <MxLink key={item.label} to={item.route}>
             <div
-              className={`flex items-center px-4 py-2 mx-2 rounded-md text-sm font-medium transition-colors
+              className={`px-4 py-2 mx-2 text-sm font-medium transition-colors
                 ${pathname === item.route 
-                  ? 'bg-gray-800 text-white' 
-                  : 'text-gray-300 hover:bg-gray-800 hover:text-white'
+                  ? 'text-white border-b-2 border-white' 
+                  : 'text-gray-300 hover:text-white hover:border-b-2 hover:border-gray-300'
                 }`}
             >
-              <item.icon className="w-5 h-5 mr-2" />
               {item.label}
             </div>
           </MxLink>
@@ -76,18 +73,17 @@ export const Header = () => {
       </nav>
 
       {/* Mobile Menu */}
-      <nav className='md:hidden flex items-center space-x-1'>
+      <nav className='md:hidden flex items-center space-x-2'>
         {menuItems.map((item) => (
           <MxLink key={item.label} to={item.route}>
             <div
-              className={`flex flex-col items-center p-1 rounded-md transition-colors min-w-[48px]
+              className={`px-2 py-1 text-xs font-medium transition-colors
                 ${pathname === item.route 
-                  ? 'bg-gray-800 text-white' 
-                  : 'text-gray-400 hover:bg-gray-800 hover:text-white'
+                  ? 'text-white border-b border-white' 
+                  : 'text-gray-400 hover:text-white hover:border-b hover:border-gray-400'
                 }`}
             >
-              <item.icon className="w-3 h-3" />
-              <span className="text-[8px] mt-0.5">{item.label}</span>
+              {item.label}
             </div>
           </MxLink>
         ))}
@@ -99,10 +95,9 @@ export const Header = () => {
           {isLoggedIn ? (
             <button
               onClick={handleLogout}
-              className='flex items-center px-1 py-1 text-xs font-medium text-gray-300 hover:bg-gray-800 hover:text-white rounded-md transition-colors'
+              className='px-2 py-1 text-xs font-medium text-gray-300 hover:text-white transition-colors'
             >
-              <Power className="w-3 h-3" />
-              <span className="hidden sm:inline ml-1">Logout</span>
+              Logout
             </button>
           ) : (
             ConnectButton
