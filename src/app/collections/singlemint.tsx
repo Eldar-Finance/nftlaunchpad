@@ -189,8 +189,8 @@ export default function SingleCollectionMint({ collectionId, onBackClick }: Sing
 
               <div className="flex justify-between items-center">
                 <div className="flex items-center">
-                  <Coins className="w-6 h-6 mr-2 text-yellow-400" />
-                  <span className="text-white text-lg">Mint Token</span>
+                  <Coins className="w-4 h-4 mr-1 text-yellow-400" />
+                  <span className="text-white text-md">Mint Token</span>
                 </div>
                 <Select value={selectedToken} onValueChange={setSelectedToken}>
                   <SelectTrigger className="w-[90px]">
@@ -202,7 +202,7 @@ export default function SingleCollectionMint({ collectionId, onBackClick }: Sing
                         <div className="flex items-center">
                           {cost.tokenIdentifier === 'EGLD' ? (
                             <img 
-                              src="/assets/img/elrond-symbol.svg"
+                              src="/assets/img/multiversx-symbol.svg"
                               alt="EGLD"
                               className="w-6 h-6 mr-2"
                             />
@@ -229,7 +229,7 @@ export default function SingleCollectionMint({ collectionId, onBackClick }: Sing
                       {formatPrice(selectedCost.amount)}
                       {selectedToken === 'EGLD' ? (
                         <img 
-                          src="/assets/img/elrond-symbol.svg"
+                          src="/assets/img/multiversx-symbol.svg"
                           alt="EGLD"
                           className="w-6 h-6 ml-2"
                         />
@@ -278,13 +278,19 @@ export default function SingleCollectionMint({ collectionId, onBackClick }: Sing
 
               <p className="text-lg text-gray-300 flex items-center">
                 Total Cost: {totalCost}
-                {selectedToken && (
-                  <img 
-                    src={`https://tools.multiversx.com/assets-cdn/devnet/tokens/${selectedToken}/icon.png`}
-                    alt={getTokenName(selectedToken)}
-                    className="w-6 h-6 ml-2"
-                  />
-                )}
+                {selectedToken === 'EGLD' ? (
+                        <img 
+                          src="/assets/img/multiversx-symbol.svg"
+                          alt="EGLD"
+                          className="w-6 h-6 ml-2"
+                        />
+                      ) : (
+                        <img 
+                          src={`https://tools.multiversx.com/assets-cdn/devnet/tokens/${selectedToken}/icon.png`}
+                          alt={getTokenName(selectedToken)}
+                          className="w-6 h-6 ml-2"
+                        />
+                      )}
               </p>
             </CardContent>
           </Card>
