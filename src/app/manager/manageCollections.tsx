@@ -1,5 +1,6 @@
 'use client'
 
+import { useState, useCallback } from 'react'
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
@@ -10,13 +11,78 @@ import {
  Fingerprint, CheckCircle, XCircle
 } from 'lucide-react'
 import { useGetCollectionsInfo } from '@/hooks/useGetCollectionsInfo'
+import { Address } from '@multiversx/sdk-core/out';
+import { newTransaction } from '@/helpers/sdkDappHelpers';
+import { signAndSendTransactions } from '@/helpers/signAndSendTransactions';
+import {
+  useGetNetworkConfig,
+  useGetAccountInfo
+} from '@/hooks/sdkDappHooks';
+import { GAS_PRICE, VERSION } from '@/localConstants';
 
 export default function CollectionManager({ collectionAddress }: { collectionAddress: string }) {
-  const { collectionsInfo, loading } = useGetCollectionsInfo([collectionAddress])
+  const [refreshTrigger, setRefreshTrigger] = useState(0);
+  const { collectionsInfo, loading } = useGetCollectionsInfo([collectionAddress]);
+  const { account } = useGetAccountInfo();
+  const nonce = account.nonce;
+  const { network } = useGetNetworkConfig();
+  const { address: connectedAddress } = useGetAccountInfo();
+
+  const refreshCollectionInfo = useCallback(() => {
+    setRefreshTrigger(prev => prev + 1);
+  }, []);
 
   const handleAction = async (action: string) => {
     console.log(`Performing action: ${action} on collection: ${collectionAddress}`)
-    // Here you would typically call your API to perform the action
+    
+    let endpoint = '';
+    let processingMessage = '';
+    let successMessage = '';
+
+    if (action === 'enableMinting') {
+      endpoint = 'enableMinting';
+      processingMessage = 'Enabling minting...';
+      successMessage = 'Minting enabled successfully';
+    } else if (action === 'disableMinting') {
+      endpoint = 'disableMinting';
+      processingMessage = 'Disabling minting...';
+      successMessage = 'Minting disabled successfully';
+    } else {
+      console.error('Unknown action');
+      return;
+    }
+
+    const hexArguments = `${endpoint}`;
+
+    const transaction = newTransaction({
+      value: 0,
+      data: hexArguments,
+      receiver: collectionAddress,
+      gasLimit: 20000000,
+      gasPrice: GAS_PRICE,
+      chainID: network.chainId,
+      nonce: nonce,
+      sender: new Address(connectedAddress),
+      version: VERSION,
+      arguments: []
+    });
+
+    try {
+      const sessionId = await signAndSendTransactions({
+        transactions: [transaction],
+        callbackRoute: '',
+        transactionsDisplayInfo: {
+          processingMessage,
+          errorMessage: 'Action failed',
+          successMessage,
+        }
+      });
+
+      console.log(`Action completed, session ID:`, sessionId);
+      refreshCollectionInfo(); // Refresh collection info after successful action
+    } catch (error) {
+      console.error('Action failed:', error);
+    }
   }
 
   if (loading) {
@@ -64,7 +130,7 @@ export default function CollectionManager({ collectionAddress }: { collectionAdd
             <InfoCard
               icon={<Users className="w-5 h-5 text-yellow-400" />}
               label="Max Per Mint"
-              value={info.maxAmountPerMint.toString()}
+              value={isNaN(info.maxAmountPerMint) ? "-" : info.maxAmountPerMint.toString()}
             />
             <InfoCard
               icon={<ImageIcon className="w-5 h-5 text-purple-400" />}
@@ -81,67 +147,82 @@ export default function CollectionManager({ collectionAddress }: { collectionAdd
           <div className="flex flex-col md:flex-row gap-6">
             <Card className="bg-gray-800 border-gray-700 flex-1">
               <CardHeader>
-                <CardTitle className="text-xl font-semibold text-white">Description</CardTitle>
+                <CardTitle className="text-xl font-semibold text-white">Minting Costs</CardTitle>
               </CardHeader>
               <CardContent>
-                <p className="text-gray-300">{info.description}</p>
+                <div className="grid grid-cols-2 gap-4">
+                  {info.mintCosts.map((cost, index) => (
+                    <div key={index} className="flex justify-between items-center bg-gray-700 p-3 rounded-lg">
+                      <span className="text-gray-300">{cost.tokenIdentifier}</span>
+                      <span className="text-white font-medium">{cost.amount / 1e18}</span>
+                    </div>
+                  ))}
+                </div>
               </CardContent>
             </Card>
 
             <Card className="bg-gray-800 border-gray-700 flex-1">
               <CardHeader>
-                <CardTitle className="text-xl font-semibold text-white">Tags</CardTitle>
+                <CardTitle className="text-xl font-semibold text-white">Add/Edit Cost</CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="flex flex-wrap gap-2">
-                  {info.tags.split(',').map((tag, index) => (
-                    <span key={index} className="px-2 py-1 bg-gray-700 rounded-full text-sm text-gray-300">
-                      {tag.trim()}
-                    </span>
-                  ))}
-                </div>
+                <form onSubmit={(e) => {
+                  e.preventDefault();
+                  // Handle form submission here
+                }} className="space-y-4">
+                  <div>
+                    <Label htmlFor="tokenIdentifier" className="text-gray-300">Token Identifier</Label>
+                    <input
+                      id="tokenIdentifier"
+                      type="text"
+                      className="w-full bg-gray-700 text-white border border-gray-600 rounded-md p-2"
+                      placeholder="e.g., EGLD"
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="amount" className="text-gray-300">Amount</Label>
+                    <input
+                      id="amount"
+                      type="number"
+                      step="0.11"
+                      className="w-full bg-gray-700 text-white border border-gray-600 rounded-md p-2"
+                      placeholder="e.g., 0.5"
+                    />
+                  </div>
+                  <Button type="submit" className="w-full bg-blue-600 hover:bg-blue-700 text-white">
+                    Add/Edit Cost
+                  </Button>
+                </form>
               </CardContent>
             </Card>
           </div>
 
           <Card className="bg-gray-800 border-gray-700">
             <CardHeader>
-              <CardTitle className="text-xl font-semibold text-white">Minting Costs</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="grid grid-cols-2 gap-4">
-                {info.mintCosts.map((cost, index) => (
-                  <div key={index} className="flex justify-between items-center bg-gray-700 p-3 rounded-lg">
-                    <span className="text-gray-300">{cost.tokenIdentifier}</span>
-                    <span className="text-white font-medium">{cost.amount / 1e18}</span>
-                  </div>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card className="bg-gray-800 border-gray-700">
-            <CardHeader>
               <CardTitle className="text-xl font-semibold text-white">Collection Status</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="grid grid-cols-1 gap-4">
-                <StatusItem
-                  label="Minting Enabled"
-                  value={info.isMintingEnabled}
-                  icon={info.isMintingEnabled ? <CheckCircle className="w-5 h-5 text-green-400" /> : <XCircle className="w-5 h-5 text-red-400" />}
-                />
+              <div className="flex flex-col md:flex-row items-center justify-between gap-4">
+                <div className="w-full md:w-1/2">
+                  <StatusItem
+                    label="Minting Enabled"
+                    value={info.isMintingEnabled}
+                    icon={info.isMintingEnabled ? <CheckCircle className="w-5 h-5 text-green-400" /> : <XCircle className="w-5 h-5 text-red-400" />}
+                  />
+                </div>
+                <div className="w-full md:w-1/2 flex justify-center md:justify-end">
+                  <ActionButton
+                    icon={info.isMintingEnabled ? <Pause className="w-4 h-4" /> : <Play className="w-4 h-4" />}
+                    label={info.isMintingEnabled ? "Disable Minting" : "Enable Minting"}
+                    onClick={() => handleAction(info.isMintingEnabled ? 'disableMinting' : 'enableMinting')}
+                    tooltipText={info.isMintingEnabled ? "Disable minting for this collection" : "Enable minting for this collection"}
+                  />
+                </div>
               </div>
             </CardContent>
           </Card>
 
           <div className="flex flex-wrap justify-center gap-4 mt-8">
-            <ActionButton
-              icon={info.isMintingEnabled ? <Pause className="w-4 h-4" /> : <Play className="w-4 h-4" />}
-              label={info.isMintingEnabled ? "Pause Minting" : "Enable Minting"}
-              onClick={() => handleAction(info.isMintingEnabled ? 'pauseMinting' : 'enableMinting')}
-              tooltipText={info.isMintingEnabled ? "Pause minting for this collection" : "Enable minting for this collection"}
-            />
             <ActionButton
               icon={<DollarSign className="w-4 h-4" />}
               label="Claim Royalties"

@@ -54,13 +54,11 @@ export const useGetCollectionsInfo = (collectionAddresses: string[]) => {
           const decodedData = response.returnData.map((data: string) => Buffer.from(data, 'base64').toString('hex'));
 
           // Log the raw decoded data
-          console.log(`Raw decoded data for address ${address}:`, response.returnData);
 
           // Convert hex to decimal for numeric fields
           const hexToDecimal = (hex: string) => parseInt(hex, 16);
           const hexToString = (hex: string) => Buffer.from(hex, 'hex').toString('utf-8');
-
-
+          console.log(`Enabled ?`, decodedData[14]);
           // Construct the collection info object
           const collectionInfo: CollectionInfo = {
             address,
@@ -77,9 +75,9 @@ export const useGetCollectionsInfo = (collectionAddresses: string[]) => {
             maxSupply: hexToDecimal(decodedData[10]),
             maxAmountPerMint: hexToDecimal(decodedData[11]),
             totalNftsMinted: hexToDecimal(decodedData[12]),
-            hasJsonMetadata: decodedData[13] === 'true',
-            isMintingEnabled: decodedData[14] === 'true',
-            isPaused: decodedData[15] === 'true',
+            hasJsonMetadata: decodedData[13] === '01',
+            isMintingEnabled: decodedData[14] === '01',
+            isPaused: decodedData[15] === '01',
             mintCosts: decodedData.slice(16).map((cost, index, array) => {
                 if (index % 2 === 0) {
                     return {
