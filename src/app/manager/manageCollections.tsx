@@ -19,6 +19,7 @@ import {
   useGetAccountInfo
 } from '@/hooks/sdkDappHooks';
 import { GAS_PRICE, VERSION } from '@/localConstants';
+import { useRouter } from 'next/navigation';
 
 export default function CollectionManager({ collectionAddress }: { collectionAddress: string }) {
   const { collectionsInfo, loading } = useGetCollectionsInfo([collectionAddress]);
@@ -26,8 +27,7 @@ export default function CollectionManager({ collectionAddress }: { collectionAdd
   const nonce = account.nonce;
   const { network } = useGetNetworkConfig();
   const { address: connectedAddress } = useGetAccountInfo();
-
- 
+  const router = useRouter();
 
   const handleAction = async (action: string) => {
     console.log(`Performing action: ${action} on collection: ${collectionAddress}`)
@@ -80,6 +80,10 @@ export default function CollectionManager({ collectionAddress }: { collectionAdd
       console.error('Action failed:', error);
     }
   }
+
+  const handleSeeMintPage = () => {
+    router.push(`/collections?select=${collectionAddress}`);
+  };
 
   if (loading) {
     return <div className="flex justify-center items-center h-screen bg-gray-950">
@@ -224,6 +228,12 @@ export default function CollectionManager({ collectionAddress }: { collectionAdd
               label="Claim Royalties"
               onClick={() => handleAction('claimRoyalties')}
               tooltipText="Claim accumulated royalties for this collection"
+            />
+            <ActionButton
+              icon={<ImageIcon className="w-4 h-4" />}
+              label="See Mint Page"
+              onClick={handleSeeMintPage}
+              tooltipText="View the minting page for this collection"
             />
           </div>
         </CardContent>

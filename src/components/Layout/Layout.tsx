@@ -10,11 +10,11 @@ import { motion } from 'framer-motion';
 
 export const Layout = ({ children }: PropsWithChildren) => {
   return (
-    <div className='flex min-h-screen flex-col bg-black text-white'>
+    <div className='flex min-h-screen flex-col bg-black text-white overflow-x-hidden'>
       <div className='relative z-10 bg-gray-900 shadow-md'>
         <Header />
       </div>
-      <main className='flex flex-grow items-stretch justify-center p-6 relative z-10'>
+      <main className='flex flex-grow items-stretch justify-center p-6 relative z-10 w-full'>
         <AuthenticatedRoutesWrapper
           routes={routes}
           unlockRoute={`${RouteNamesEnum.unlock}`}
