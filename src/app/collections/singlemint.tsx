@@ -324,7 +324,7 @@ export default function SingleCollectionMint({ collectionId, onBackClick }: Sing
               </p>
 
               <p className="text-md text-gray-300">
-                You have {collectionData.userMaxMints - collectionData.userMinted} NFTs left to mint.
+                {isNaN(collectionData.userMaxMints) || isNaN(collectionData.userMinted) ? "You can mint as many as you want" : `You have ${collectionData.userMaxMints - collectionData.userMinted} NFTs left to mint.`}
               </p>
 
               {collectionData.isPhaseWlOnly && (
@@ -360,13 +360,6 @@ export default function SingleCollectionMint({ collectionId, onBackClick }: Sing
                     <span className="text-gray-400">Max Mints</span>
                   </div>
                   <span className="text-white">{collectionData.maxMints || 'N/A'}</span>
-                </div>
-                <div className="flex justify-between items-center">
-                  <div className="flex items-center">
-                    <Coins className="w-5 h-5 mr-2 text-yellow-400" />
-                    <span className="text-gray-400">Minted</span>
-                  </div>
-                  <span className="text-white">{collectionData.minted || 'N/A'}</span>
                 </div>
                 <div className="flex justify-between items-center">
                   <div className="flex items-center">
