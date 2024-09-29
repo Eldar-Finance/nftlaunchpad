@@ -50,3 +50,4 @@ cypress/screenshots/
 cypress/videos/
 
 yarn.lock
+package-lock.json
