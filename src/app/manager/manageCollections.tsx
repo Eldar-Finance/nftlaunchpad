@@ -9,7 +9,7 @@ import {
   Tag, Image as ImageIcon, Hash, DollarSign, 
   LayoutGrid, Users, Pause, Play, RefreshCw,
   Fingerprint, CheckCircle, XCircle, Plus, Minus,
-  ChevronDown, ChevronUp
+  ChevronDown, ChevronUp, PlusCircle
 } from 'lucide-react'
 import { useGetCollectionsInfo } from '@/hooks/useGetCollectionsInfo'
 import { Address, TokenIdentifierValue } from '@multiversx/sdk-core/out'
@@ -287,11 +287,21 @@ export default function CollectionManager({ collectionAddress }: { collectionAdd
               <CardTitle className="text-xl font-semibold text-white">Create New Phase</CardTitle>
               <Button
                 variant="outline"
-                size="sm"
+                size="lg"
                 onClick={() => setShowCreatePhase(!showCreatePhase)}
-                className="bg-gray-700 hover:bg-gray-600 text-white border-gray-600"
+                className="bg-blue-600 hover:bg-blue-700 text-white border-blue-500"
               >
-                {showCreatePhase ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+                {showCreatePhase ? (
+                  <>
+                    <ChevronUp className="h-5 w-5 mr-2" />
+                    Hide Form
+                  </>
+                ) : (
+                  <>
+                    <PlusCircle className="h-5 w-5 mr-2" />
+                    Create New Phase
+                  </>
+                )}
               </Button>
             </CardHeader>
             <CardContent>
@@ -379,58 +389,21 @@ export default function CollectionManager({ collectionAddress }: { collectionAdd
             </CardContent>
           </Card>
 
-          <div className="flex flex-col md:flex-row gap-6">
-            <Card className="bg-gray-800 border-gray-700 flex-1">
-              <CardHeader>
-                <CardTitle className="text-xl font-semibold text-white">Minting Costs</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="grid grid-cols-2 gap-4">
-                  {info.mintCosts.map((cost, index) => (
-                    <div key={index} className="flex justify-between items-center bg-gray-700 p-3 rounded-lg">
-                      <span className="text-gray-300">{cost.tokenIdentifier}</span>
-                      <span className="text-white font-medium">{cost.amount / 1e18}</span>
-                    </div>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card className="bg-gray-800 border-gray-700 flex-1">
-              <CardHeader>
-                <CardTitle className="text-xl font-semibold text-white">Add/Edit Cost</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <form onSubmit={(e) => {
-                  e.preventDefault()
-                  // Handle form submission here
-                }} className="space-y-4">
-                  <div>
-                    <Label htmlFor="tokenIdentifier" className="text-gray-300">Token Identifier</Label>
-                    <input
-                      id="tokenIdentifier"
-                      type="text"
-                      className="w-full bg-gray-700 text-white border border-gray-600 rounded-md p-2"
-                      placeholder="e.g., EGLD"
-                    />
+          <Card className="bg-gray-800 border-gray-700">
+            <CardHeader>
+              <CardTitle className="text-xl font-semibold text-white">Minting Costs</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-2 gap-4">
+                {info.mintCosts.map((cost, index) => (
+                  <div key={index} className="flex justify-between items-center bg-gray-700 p-3 rounded-lg">
+                    <span className="text-gray-300">{cost.tokenIdentifier}</span>
+                    <span className="text-white font-medium">{cost.amount / 1e18}</span>
                   </div>
-                  <div>
-                    <Label htmlFor="amount" className="text-gray-300">Amount</Label>
-                    <input
-                      id="amount"
-                      type="number"
-                      step="0.11"
-                      className="w-full bg-gray-700 text-white border border-gray-600 rounded-md p-2"
-                      placeholder="e.g., 0.5"
-                    />
-                  </div>
-                  <Button type="submit" className="w-full bg-blue-600 hover:bg-blue-700 text-white">
-                    Add/Edit Cost
-                  </Button>
-                </form>
-              </CardContent>
-            </Card>
-          </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
 
           <Card className="bg-gray-800 border-gray-700">
             <CardHeader>
