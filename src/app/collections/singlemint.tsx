@@ -207,7 +207,7 @@ export default function SingleCollectionMint({ collectionId, onBackClick }: Sing
                 <TooltipProvider>
                   <Tooltip>
                     <TooltipTrigger>
-                      <Progress value={(collectionData.totalNftsMinted / collectionData.maxSupply) * 100} className="w-32 h-3 rounded-full" />
+                      <Progress value={isNaN((collectionData.totalNftsMinted / collectionData.maxSupply) * 100) ? 0 : (collectionData.totalNftsMinted / collectionData.maxSupply) * 100} className="w-32 h-3 rounded-full" />
                     </TooltipTrigger>
                     <TooltipContent side="top">
                       <p className="text-white">{((collectionData.totalNftsMinted / collectionData.maxSupply) * 100).toFixed(1)}% minted</p>
@@ -217,10 +217,9 @@ export default function SingleCollectionMint({ collectionId, onBackClick }: Sing
               </div>
 
               <div className="flex justify-between items-center">
-                <div className="flex items-center">
-                  <Coins className="w-4 h-4 mr-1 text-yellow-400" />
-                  <span className="text-white text-md">Mint Token</span>
-                </div>
+                <Coins className="w-4 h-4 mr-1 text-yellow-400" />
+              <span className="text-white text-md">Mint Token</span>
+          
                 <Select value={selectedToken} onValueChange={setSelectedToken}>
                   <SelectTrigger className="w-[90px]">
                     <SelectValue placeholder="Select token" />
