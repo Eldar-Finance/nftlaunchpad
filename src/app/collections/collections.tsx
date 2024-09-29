@@ -75,8 +75,8 @@ interface CollectionsProps {
 
 export default function Collections({ onCollectionSelect }: CollectionsProps) {
   const [hoveredCard, setHoveredCard] = useState<string | null>(null)
-  const liveMinters = useGetLiveMinters();
-
+  const {liveMinters, isLoading} = useGetLiveMinters();
+  console.log('⚠️ ~ liveMinters:', liveMinters);
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-950 to-gray-900 text-gray-200 p-8">

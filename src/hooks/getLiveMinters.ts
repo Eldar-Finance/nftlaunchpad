@@ -2,11 +2,10 @@
 
 import { useEffect, useState } from 'react';
 import { useGetNetworkConfig } from '@/hooks';
-import { Address, ResultsParser, AbiRegistry } from '@multiversx/sdk-core';
+import { Address, ResultsParser, AbiRegistry, ContractFunction } from '@multiversx/sdk-core';
 import { ProxyNetworkProvider } from '@multiversx/sdk-network-providers';
 import { SmartContract } from '@multiversx/sdk-core/out';
-
-const resultsParser = new ResultsParser();
+import proxyAbyJson from '@/contracts/nft_minter_proxy.abi.json';
 
 export interface LiveMinter {
   address: string;
@@ -16,70 +15,67 @@ export interface LiveMinter {
   minted: number;
   maxSupply: number;
   tokenIdentifier: string;
-  cost: string;
+  cost: number;
 }
 
 export const useGetLiveMinters = () => {
-  const { network } = useGetNetworkConfig();
-  
   const [liveMinters, setLiveMinters] = useState<LiveMinter[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-
-  const getLiveMinters = async () => {
-    try {
-      setIsLoading(true);
-      setError(null);
-
-      const proxy = new ProxyNetworkProvider(network.apiAddress);
-      
-      // Load ABI
-      const abi = await AbiRegistry.create({
-        name: 'NftMinterProxy',
-        endpoints: require('src/app/contracts/nft_minter_proxy.abi.json')
-      });
-      const smartContractAbi = abi;
-      
-      // Create smart contract instance
-      const contract = new SmartContract({
-        address: new Address('erd1qqqqqqqqqqqqqpgq0vct9qkqcnr0vgj8hsvdmufzxy9nevppu7zs8qzs0r'),
-        abi: smartContractAbi
-      });
-
-      // Query contract
-      const interaction = contract.methods.getLiveMinters();
-      const query = interaction.buildQuery();
-      const queryResponse = await proxy.queryContract(query);
-      
-      // Decode response
-      const endpointDefinition = interaction.getEndpoint();
-      const { values } = new ResultsParser().parseQueryResponse(queryResponse, endpointDefinition);
-
-      // Parse results
-      const parsedLiveMinters: LiveMinter[] = values.map((minter: any) => ({
-        address: minter.address.bech32(),
-        collectionName: minter.name.toString(),
-        collectionDescription: minter.description.toString(),
-        ipfsCid: minter.ipfsCid.toString(),
-        minted: minter.minted.toNumber(),
-        maxSupply: minter.maxSupply.toNumber(),
-        tokenIdentifier: minter.tokenIdentifier.toString(),
-        cost: minter.cost.toString()
-      }));
-
-      // console.log("Parsed Live Minters:", parsedLiveMinters);
-      setLiveMinters(parsedLiveMinters);
-    } catch (error) {
-      console.error("Error fetching live minters:", error);
-      setError("Failed to fetch live minters");
-    } finally {
-      setIsLoading(false);
-    }
-  };
+  const { network } = useGetNetworkConfig();
+  const proxy = new ProxyNetworkProvider(network.apiAddress);
 
   useEffect(() => {
-    getLiveMinters();
+    const fetchLiveMinters = async () => {
+      const fetchedLiveMinters: LiveMinter[] = [];
+
+      const contract = new SmartContract({
+        address: new Address('erd1qqqqqqqqqqqqqpgq0vct9qkqcnr0vgj8hsvdmufzxy9nevppu7zs8qzs0r'),
+        abi: AbiRegistry.create(proxyAbyJson)
+      });
+
+      try {
+        const query = contract.createQuery({
+          func: new ContractFunction('getLiveMinters'),
+          args: []
+        });
+        const response = await proxy.queryContract(query);
+
+        // Decode returned data
+        const decodedData = response.returnData.map((data: string) => Buffer.from(data, 'base64').toString('hex'));
+
+        // Convert hex to decimal for numeric fields
+        const hexToDecimal = (hex: string) => parseInt(hex, 16);
+        const hexToString = (hex: string) => Buffer.from(hex, 'hex').toString('utf-8');        
+
+        // Construct LiveMinters from 8-tuples
+        const minters = decodedData
+          .filter((_, index) => index % 8 === 0)
+          .map((_, index) => decodedData.slice(index * 8, (index + 1) * 8));
+        
+        minters.forEach((minter) => {
+          fetchedLiveMinters.push({
+            address: Address.fromHex(minter[0]).bech32(),
+            collectionName: hexToString(minter[1]),
+            collectionDescription: hexToString(minter[2]),
+            ipfsCid: hexToString(minter[3]),
+            minted: hexToDecimal(minter[4]),
+            maxSupply: hexToDecimal(minter[5]),
+            tokenIdentifier: hexToString(minter[6]),
+            cost: hexToDecimal(minter[7])
+          });
+        });
+
+        setLiveMinters(fetchedLiveMinters);
+        setIsLoading(false);
+      } catch (error: unknown) {
+        console.error('Error fetching live minters:', error);
+        setIsLoading(false);
+        return;
+      }
+    };
+
+    fetchLiveMinters();
   }, []);
 
-  return { liveMinters, isLoading, error };
+  return { liveMinters, isLoading };
 };

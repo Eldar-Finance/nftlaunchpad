@@ -215,7 +215,8 @@
                 "- IPFS CID",
                 "- Minted",
                 "- Max Supply",
-                "- Costs"
+                "- Cost Token",
+                "- Cost Amount"
             ],
             "name": "getLiveMinters",
             "mutability": "readonly",
