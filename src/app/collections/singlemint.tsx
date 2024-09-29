@@ -9,7 +9,7 @@ import { Progress } from "@/components/ui/progress"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Users, ArrowLeft, Coins, Percent, Plus, Minus } from 'lucide-react'
+import { Users, ArrowLeft, Coins, Percent, Plus, Minus, Tag, Hash, CheckCircle, XCircle } from 'lucide-react'
 
 import { useGetCollectionsInfo } from '@/hooks/useGetCollectionsInfo'
 
@@ -32,6 +32,10 @@ interface CollectionInfo {
   isMintingEnabled: boolean;
   isPaused: boolean;
   mintCosts: { tokenIdentifier: string; amount: number }[];
+  phaseName: string;
+  maxMints: number;
+  minted: number;
+  isPhaseWlOnly: boolean;
 }
 
 interface SingleCollectionMintProps {
@@ -78,9 +82,7 @@ export default function SingleCollectionMint({ collectionId, onBackClick }: Sing
   };
 
   const incrementMintAmount = () => {
-  
-      setMintAmount(prev => prev + 1)
-    
+    setMintAmount(prev => Math.min(prev + 1, collectionData?.maxAmountPerMint || 1))
   }
 
   const decrementMintAmount = () => {
@@ -279,30 +281,67 @@ export default function SingleCollectionMint({ collectionId, onBackClick }: Sing
               <p className="text-lg text-gray-300 flex items-center">
                 Total Cost: {totalCost}
                 {selectedToken === 'EGLD' ? (
-                        <img 
-                          src="/assets/img/multiversx-symbol.svg"
-                          alt="EGLD"
-                          className="w-6 h-6 ml-2"
-                        />
-                      ) : (
-                        <img 
-                          src={`https://tools.multiversx.com/assets-cdn/devnet/tokens/${selectedToken}/icon.png`}
-                          alt={getTokenName(selectedToken)}
-                          className="w-6 h-6 ml-2"
-                        />
-                      )}
+                  <img 
+                    src="/assets/img/multiversx-symbol.svg"
+                    alt="EGLD"
+                    className="w-6 h-6 ml-2"
+                  />
+                ) : (
+                  <img 
+                    src={`https://tools.multiversx.com/assets-cdn/devnet/tokens/${selectedToken}/icon.png`}
+                    alt={getTokenName(selectedToken)}
+                    className="w-6 h-6 ml-2"
+                  />
+                )}
               </p>
             </CardContent>
           </Card>
 
           <Card className="bg-gradient-to-br from-gray-800 to-gray-900 border-gray-700 backdrop-blur-md rounded-3xl shadow-2xl overflow-hidden">
-            <Tabs defaultValue="description" className="w-full">
+            <Tabs defaultValue="current-phase" className="w-full">
               <TabsList className="grid w-full grid-cols-2 bg-gray-900 p-1 rounded-t-3xl">
-                <TabsTrigger value="description" className="rounded-2xl">Description</TabsTrigger>
+                <TabsTrigger value="current-phase" className="rounded-2xl">Current Phase</TabsTrigger>
                 <TabsTrigger value="details" className="rounded-2xl">Details</TabsTrigger>
               </TabsList>
-              <TabsContent value="description" className="p-6">
-                <p className="text-white">{collectionData.description}</p>
+              <TabsContent value="current-phase" className="p-6 space-y-4">
+                <div className="flex justify-between items-center">
+                  <div className="flex items-center">
+                    <Tag className="w-5 h-5 mr-2 text-blue-400" />
+                    <span className="text-gray-400">Phase Name</span>
+                  </div>
+                  <span className="text-white">{collectionData.phaseName || 'N/A'}</span>
+                </div>
+                <div className="flex justify-between items-center">
+                  <div className="flex items-center">
+                    <Hash className="w-5 h-5 mr-2 text-green-400" />
+                    <span className="text-gray-400">Max Mints</span>
+                  </div>
+                  <span className="text-white">{collectionData.maxMints || 'N/A'}</span>
+                </div>
+                <div className="flex justify-between items-center">
+                  <div className="flex items-center">
+                    <Coins className="w-5 h-5 mr-2 text-yellow-400" />
+                    <span className="text-gray-400">Minted</span>
+                  </div>
+                  <span className="text-white">{collectionData.minted || 'N/A'}</span>
+                </div>
+                <div className="flex justify-between items-center">
+                  <div className="flex items-center">
+                    <Users className="w-5 h-5 mr-2 text-purple-400" />
+                    <span className="text-gray-400">Whitelist Only</span>
+                  </div>
+                  <span className="text-white flex items-center">
+                    {collectionData.isPhaseWlOnly ? (
+                      <>Yes <CheckCircle className="w-5 h-5 ml-2 text-green-400" /></>
+                    ) : (
+                      <>No <XCircle className="w-5 h-5 ml-2 text-red-400" /></>
+                    )}
+                  </span>
+                </div>
+                <div className="mt-4">
+                  <h3 className="text-lg font-semibold text-white mb-2">Description</h3>
+                  <p className="text-gray-300">{collectionData.description}</p>
+                </div>
               </TabsContent>
               <TabsContent value="details" className="p-6 space-y-4">
                 <div className="flex justify-between items-center">
