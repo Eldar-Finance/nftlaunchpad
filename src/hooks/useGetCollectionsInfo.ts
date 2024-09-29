@@ -95,12 +95,12 @@ export const useGetCollectionsInfo = (collectionAddresses: string[]) => {
             isPaused: decodedData[21] === '01',
             isPhaseWlOnly: decodedData[22] === '01',
             canUserTryToMint: decodedData[23] === '01',
-            mintCosts: decodedData // decodedData from 24 to end comes in 3-tuples of tokenIdentifier, empty, and amount
+            mintCosts: decodedData // decodedData from 24 to end comes in 2-tuples of tokenIdentifier and amount
               .slice(24)
-              .filter((_, index) => index % 3 === 0)
+              .filter((_, index) => index % 2 === 0)
               .map((tokenIdentifier, index) => ({
                 tokenIdentifier: hexToString(tokenIdentifier),
-                amount: hexToDecimal(decodedData[24 + index * 3 + 2])
+                amount: hexToDecimal(decodedData[24 + index * 2 + 1])
               })
             )
           };
