@@ -10,8 +10,13 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/comp
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Users, ArrowLeft, Coins, Percent, Plus, Minus, Tag, Hash, CheckCircle, XCircle, AlertCircle } from 'lucide-react'
-
 import { useGetCollectionsInfo } from '@/hooks/useGetCollectionsInfo'
+import { Address } from '@multiversx/sdk-core'
+import { GAS_PRICE, VERSION } from '@/localConstants'
+import { newTransaction } from '@/helpers/sdkDappHelpers'
+import { signAndSendTransactions } from '@/helpers/signAndSendTransactions'
+import { useGetAccountInfo } from '@multiversx/sdk-dapp/hooks'
+
 
 interface CollectionInfo {
   address: string;
@@ -52,6 +57,10 @@ export default function SingleCollectionMint({ collectionId, onBackClick }: Sing
   const [isHovered, setIsHovered] = useState(false)
   const [randomImageNumber, setRandomImageNumber] = useState(3)
   const controls = useAnimation()
+  const { account } = useGetAccountInfo()
+  const nonce = account.nonce
+  const { network } = useGetNetworkConfig()
+  const { address: connectedAddress } = useGetAccountInfo()
   
   const { collectionsInfo, loading } = useGetCollectionsInfo([collectionId]);
   const collectionData: CollectionInfo | undefined = collectionsInfo[0];
@@ -79,9 +88,67 @@ export default function SingleCollectionMint({ collectionId, onBackClick }: Sing
     return identifier.split('-')[0];
   };
 
-  const handleMint = () => {
-    // console.log(`Minting ${mintAmount} NFTs from collection ${collectionId} with token ${selectedToken}`);
-    // Implement minting logic here
+  const stringToHex = (str: string) => {
+    return Buffer.from(str, 'utf8').toString('hex');
+  };
+
+  const ensureEvenHex = (hex: string) => hex.length % 2 === 0 ? hex : '0' + hex;
+
+  const handleMint = async () => {
+    if (!collectionData || !selectedToken) {
+      console.error('Collection data or selected token is missing');
+      return;
+    }
+
+    const selectedCost = collectionData.mintCosts.find(cost => cost.tokenIdentifier === selectedToken);
+    if (!selectedCost) {
+      console.error('Selected token cost not found');
+      return;
+    }
+
+    const totalCost = selectedCost.amount * mintAmount;
+
+    // Prepare hex arguments
+    const collectionIdentifier = ensureEvenHex(stringToHex(collectionData.collectionIdentifier));
+    const mintAmountHex = ensureEvenHex(mintAmount.toString(16));
+    const totalCostHex = ensureEvenHex(totalCost.toString(16));
+    const tokenIdentifierHex = ensureEvenHex(stringToHex(selectedToken));
+
+    // Construct hexArguments
+    let hexArguments;
+    if (selectedToken === 'EGLD') {
+      hexArguments = `mint@${collectionIdentifier}@${mintAmountHex}`;
+    } else {
+      hexArguments = `ESDTTransfer@${tokenIdentifierHex}@${totalCostHex}@mint@${collectionIdentifier}@${mintAmountHex}`;
+    }
+
+    const mintTransaction = newTransaction({
+      value: selectedToken === 'EGLD' ? totalCost : 0,
+      data: hexArguments,
+      receiver: collectionId,
+      gasLimit: 20000000,
+      gasPrice: GAS_PRICE,
+      chainID: network.chainId,
+      nonce: nonce,
+      sender: new Address(connectedAddress),
+      version: VERSION,
+    });
+
+    try {
+      const sessionId = await signAndSendTransactions({
+        transactions: [mintTransaction],
+        callbackRoute: '',
+        transactionsDisplayInfo: {
+          processingMessage: 'Minting NFTs...',
+          errorMessage: 'Minting failed',
+          successMessage: 'NFTs minted successfully'
+        }
+      });
+
+      console.log('Minting initiated, session ID:', sessionId);
+    } catch (error) {
+      console.error('Minting failed:', error);
+    }
   };
 
   const incrementMintAmount = () => {
