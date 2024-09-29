@@ -10,7 +10,7 @@ import {
  Fingerprint, CheckCircle, XCircle, Plus, Minus
 } from 'lucide-react'
 import { useGetCollectionsInfo } from '@/hooks/useGetCollectionsInfo'
-import { Address, AddressValue, BigUIntValue, TokenIdentifierValue } from '@multiversx/sdk-core/out'
+import { Address, TokenIdentifierValue } from '@multiversx/sdk-core/out'
 import { newTransaction } from '@/helpers/sdkDappHelpers'
 import { signAndSendTransactions } from '@/helpers/signAndSendTransactions'
 import {
@@ -22,7 +22,6 @@ import { useRouter } from 'next/navigation'
 import { useState } from 'react'
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
-import { BytesValue } from '@multiversx/sdk-core/out'
 import BigNumber from 'bignumber.js'
 
 interface Cost {
