@@ -91,7 +91,7 @@ export default function CollectionManager({ collectionAddress }: { collectionAdd
  
       const amountHex = toEvenLength(cost.amount.times(1e18).integerValue().toString(16));
       const amountLength = toEvenLengthHex(amountHex.length/2);
-      const amountLengthHex =  toEvenLengthHex(amountLength.toString().padStart(16, '0'))
+      const amountLengthHex =  toEvenLengthHex(amountLength.toString().padStart(8, '0'))
 
       return `${tokenLengthHex}${tokenHex}${amountLengthHex}${amountHex}`
     }).join('')
