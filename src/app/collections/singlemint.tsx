@@ -9,7 +9,7 @@ import { Progress } from "@/components/ui/progress"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Users, ArrowLeft, Coins, Percent, Plus, Minus, Tag, Hash, CheckCircle, XCircle } from 'lucide-react'
+import { Users, ArrowLeft, Coins, Percent, Plus, Minus, Tag, Hash, CheckCircle, XCircle, AlertCircle } from 'lucide-react'
 
 import { useGetCollectionsInfo } from '@/hooks/useGetCollectionsInfo'
 
@@ -36,6 +36,9 @@ interface CollectionInfo {
   maxMints: number;
   minted: number;
   isPhaseWlOnly: boolean;
+  userMaxMints: number;
+  userMinted: number;
+  canUserTryToMint: boolean;
 }
 
 interface SingleCollectionMintProps {
@@ -82,7 +85,7 @@ export default function SingleCollectionMint({ collectionId, onBackClick }: Sing
   };
 
   const incrementMintAmount = () => {
-    setMintAmount(prev => Math.min(prev + 1, collectionData?.maxAmountPerMint || 1))
+    setMintAmount(prev => Math.min(prev + 1, getMaxMintAmount()))
   }
 
   const decrementMintAmount = () => {
@@ -93,9 +96,26 @@ export default function SingleCollectionMint({ collectionId, onBackClick }: Sing
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = parseInt(e.target.value);
-    if (!isNaN(value) && value >= 1 && value <= (collectionData?.maxAmountPerMint || 1)) {
+    if (!isNaN(value) && value >= 1 && value <= getMaxMintAmount()) {
       setMintAmount(value);
     }
+  }
+
+  const getMaxMintAmount = () => {
+    if (!collectionData) return 1;
+    const remainingMints = collectionData.maxMints - collectionData.minted;
+    const userRemainingMints = collectionData.userMaxMints - collectionData.userMinted;
+    return Math.min(50, remainingMints, userRemainingMints, collectionData.maxAmountPerMint);
+  }
+
+  const isMintingDisabled = () => {
+    if (!collectionData) return true;
+    return (
+      !collectionData.isMintingEnabled ||
+      !selectedToken ||
+      collectionData.minted >= collectionData.maxMints ||
+      (collectionData.isPhaseWlOnly && !collectionData.canUserTryToMint)
+    );
   }
 
   if (loading) {
@@ -258,6 +278,7 @@ export default function SingleCollectionMint({ collectionId, onBackClick }: Sing
                   <Input 
                     type="number" 
                     min={1} 
+                    max={getMaxMintAmount()}
                     value={mintAmount} 
                     onChange={handleInputChange}
                     className="w-16 bg-transparent text-white border-0 text-center text-lg [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
@@ -271,8 +292,8 @@ export default function SingleCollectionMint({ collectionId, onBackClick }: Sing
                 </div>
                 <Button 
                   onClick={handleMint}
-                  disabled={!collectionData.isMintingEnabled || !selectedToken}
-                  className={`bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white text-lg px-8 py-6 rounded-full transition-all duration-300 transform hover:scale-105 ${(!collectionData.isMintingEnabled || !selectedToken) ? 'opacity-50 cursor-not-allowed' : ''}`}
+                  disabled={isMintingDisabled()}
+                  className={`bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white text-lg px-8 py-6 rounded-full transition-all duration-300 transform hover:scale-105 ${isMintingDisabled() ? 'opacity-50 cursor-not-allowed' : ''}`}
                 >
                   Mint Now
                 </Button>
@@ -294,6 +315,21 @@ export default function SingleCollectionMint({ collectionId, onBackClick }: Sing
                   />
                 )}
               </p>
+
+              <p className="text-md text-gray-300">
+                You have {collectionData.userMaxMints - collectionData.userMinted} NFTs left to mint.
+              </p>
+
+              {collectionData.isPhaseWlOnly && (
+                <p className="text-md text-gray-300 flex items-center">
+                  <AlertCircle className="w-4 h-4 mr-2" />
+                  {collectionData.canUserTryToMint ? (
+                    "You are eligible to mint."
+                  ) : (
+                    "You are not eligible to mint."
+                  )}
+                </p>
+              )}
             </CardContent>
           </Card>
 
