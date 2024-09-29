@@ -110,7 +110,7 @@ export default function SingleCollectionMint({ collectionId, onBackClick }: Sing
 
     // Prepare hex arguments
     const mintAmountHex = ensureEvenHex(mintAmount.toString(16));
-    const totalCostHex = ensureEvenHex(totalCost.toString(16));
+    const totalCostHex = ensureEvenHex(Math.floor(totalCost*1e18).toString(16));
     const tokenIdentifierHex = ensureEvenHex(stringToHex(selectedToken));
 
     // Construct hexArguments
@@ -118,7 +118,7 @@ export default function SingleCollectionMint({ collectionId, onBackClick }: Sing
     if (selectedToken === 'EGLD') {
       hexArguments = `mint@${mintAmountHex}`;
     } else {
-      hexArguments = `ESDTTransfer@${tokenIdentifierHex}@${totalCostHex}@mint@${mintAmountHex}`;
+      hexArguments = `ESDTTransfer@${tokenIdentifierHex}@${totalCostHex}@${stringToHex('mint')}@${mintAmountHex}`;
     }
 
     const mintTransaction = newTransaction({
