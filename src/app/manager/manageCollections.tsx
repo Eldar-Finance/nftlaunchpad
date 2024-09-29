@@ -30,7 +30,7 @@ interface Cost {
 }
 
 function toEvenLengthHex(value: number | string): string {
-  let hex = value.toString(16);
+  const hex = value.toString(16);
   return hex.length % 2 ? '0' + hex : hex;
 }
 

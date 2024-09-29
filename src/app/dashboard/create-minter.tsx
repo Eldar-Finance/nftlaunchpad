@@ -1,3 +1,4 @@
+
 'use client'
 
 import { useState } from 'react'
@@ -59,17 +60,16 @@ export function CreateMinter({ onBack }: CreateMinterProps) {
     });
 
     try {
-        const sessionId = await signAndSendTransactions({
-            transactions: [createCollectionTransaction],
-            callbackRoute: '',
-            transactionsDisplayInfo: {
-                processingMessage: 'Creating Collection...',
-                errorMessage: 'Collection creation failed',
-                successMessage: 'Collection created successfully'
-            }
-        });
-
-        // console.log('Collection created, session ID:', sessionId);
+      const sessionId = await signAndSendTransactions({
+        transactions: [createCollectionTransaction],
+        callbackRoute: '',
+        transactionsDisplayInfo: {
+          processingMessage: 'Creating collection...',
+          errorMessage: 'Failed to create collection',
+          successMessage: 'collection created successfully',
+        }
+      })
+      console.log(`Action completed, session ID:`, sessionId)
     } catch (error) {
         console.error('Collection creation failed:', error);
     }
