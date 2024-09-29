@@ -145,7 +145,7 @@ export default function SingleCollectionMint({ collectionId, onBackClick }: Sing
   const imageUrl = `https://ipfs.io/ipfs/${collectionData.ipfsCid}/${randomImageNumber}.${collectionData.fileEnding}`
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-gray-900 to-black text-gray-200 p-8 overflow-hidden">
+    <div className="min-h-screen bg-transparenttext-gray-200 p-8 overflow-hidden">
       <motion.div 
         className="flex items-center justify-between mb-12"
         initial={{ opacity: 0, y: -50 }}
