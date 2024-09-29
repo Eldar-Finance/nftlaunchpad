@@ -1,9 +1,11 @@
+/* eslint-disable @typescript-eslint/no-unused-vars, @typescript-eslint/no-explicit-any */
+
 "use client"
 
-import { useState, useRef, useEffect } from 'react'
+import { useState, useRef } from 'react'
 import { motion, useScroll, useTransform, AnimatePresence } from 'framer-motion'
-import { Canvas, useFrame, useThree } from '@react-three/fiber'
-import { OrbitControls, Text, useGLTF, Environment, MeshTransmissionMaterial } from '@react-three/drei'
+import { Canvas, useFrame } from '@react-three/fiber'
+import { OrbitControls, Text, Environment, MeshTransmissionMaterial } from '@react-three/drei'
 import * as THREE from 'three'
 import Link from 'next/link'
 import { Button } from "@/components/ui/button"
@@ -25,7 +27,6 @@ export default function LandingPage() {
     offset: ["start start", "end start"]
   })
 
-  const backgroundY = useTransform(scrollYProgress, [0, 1], ["0%", "100%"])
   const textY = useTransform(scrollYProgress, [0, 0.5, 1], ["0%", "50%", "100%"])
 
   return (
