@@ -109,7 +109,6 @@ export default function SingleCollectionMint({ collectionId, onBackClick }: Sing
     const totalCost = selectedCost.amount * mintAmount;
 
     // Prepare hex arguments
-    const collectionIdentifier = ensureEvenHex(stringToHex(collectionData.collectionIdentifier));
     const mintAmountHex = ensureEvenHex(mintAmount.toString(16));
     const totalCostHex = ensureEvenHex(totalCost.toString(16));
     const tokenIdentifierHex = ensureEvenHex(stringToHex(selectedToken));
