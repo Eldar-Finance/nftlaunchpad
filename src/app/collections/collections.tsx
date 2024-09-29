@@ -7,6 +7,8 @@ import { Button } from "@/components/ui/button"
 import { Progress } from "@/components/ui/progress"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 import {  Users, DollarSign, Clock } from 'lucide-react'
+import { useGetLiveMinters } from '@/hooks/getLiveMinters';
+
 
 // Dummy data for collections (unchanged)
 const dummyCollections = [
@@ -73,6 +75,7 @@ interface CollectionsProps {
 
 export default function Collections({ onCollectionSelect }: CollectionsProps) {
   const [hoveredCard, setHoveredCard] = useState<string | null>(null)
+  const liveMinters = useGetLiveMinters();
 
 
   return (
