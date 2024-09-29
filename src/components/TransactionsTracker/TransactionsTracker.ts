@@ -6,11 +6,11 @@ import { useBatchTransactionsTracker } from '@/hooks/sdkDappHooks';
 export const TransactionsTracker = () => {
   useTransactionsTracker({
     onSuccess: (sessionId: string) => {
-       console.log(`Session ${sessionId} successfully completed`);
+       // console.log(`Session ${sessionId} successfully completed`);
     },
     onFail: (sessionId: string, errorMessage?: string) => {
       if (errorMessage) {
-         console.log(`Session ${sessionId} failed, ${errorMessage}`);
+         // console.log(`Session ${sessionId} failed, ${errorMessage}`);
         return;
       }
 
@@ -22,15 +22,15 @@ export const TransactionsTracker = () => {
   // By doing this it will enable the tracker but without the sendTransactions logic
   useBatchTransactionsTracker({
     onSuccess: (sessionId) => {
-       console.log(`Batch with session ${sessionId} successfully completed`);
+       // console.log(`Batch with session ${sessionId} successfully completed`);
     },
     onFail: (sessionId, errorMessage) => {
       if (errorMessage) {
-         console.log(`Batch with session ${sessionId} failed, ${errorMessage}`);
+         // console.log(`Batch with session ${sessionId} failed, ${errorMessage}`);
         return;
       }
 
-       console.log(`Batch with session ${sessionId} failed`);
+       // console.log(`Batch with session ${sessionId} failed`);
     }
   });
 

@@ -67,7 +67,7 @@ export const useGetLiveMinters = () => {
         cost: minter.cost.toString()
       }));
 
-      console.log("Parsed Live Minters:", parsedLiveMinters);
+      // console.log("Parsed Live Minters:", parsedLiveMinters);
       setLiveMinters(parsedLiveMinters);
     } catch (error) {
       console.error("Error fetching live minters:", error);

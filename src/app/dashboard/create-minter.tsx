@@ -39,7 +39,7 @@ export function CreateMinter({ onBack }: CreateMinterProps) {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    //console.log('Launchpad finalized for collection:', selectedCollection);
+    // console.log('Launchpad finalized for collection:', selectedCollection);
 
     const selectedCollectionAddress = collections.find(collection => collection.name === selectedCollection)?.address;
 
@@ -69,7 +69,7 @@ export function CreateMinter({ onBack }: CreateMinterProps) {
           successMessage: 'collection created successfully',
         }
       })
-      console.log(`Action completed, session ID:`, sessionId)
+      // console.log(`Action completed, session ID:`, sessionId)
     } catch (error) {
         console.error('Collection creation failed:', error);
     }

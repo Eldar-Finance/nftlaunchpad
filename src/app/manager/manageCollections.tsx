@@ -133,14 +133,14 @@ export default function CollectionManager({ collectionAddress }: { collectionAdd
           successMessage: 'Phase created successfully',
         }
       })
-      console.log(`Phase created, session ID:`, sessionId)
+      // console.log(`Phase created, session ID:`, sessionId)
     } catch (error) {
       console.error('Failed to create phase:', error)
     }
   }
 
   const handleAction = async (action: string) => {
-    console.log(`Performing action: ${action} on collection: ${collectionAddress}`)
+    // console.log(`Performing action: ${action} on collection: ${collectionAddress}`)
     
     let endpoint = ''
     let processingMessage = ''
@@ -185,7 +185,7 @@ export default function CollectionManager({ collectionAddress }: { collectionAdd
         }
       })
 
-      console.log(`Action completed, session ID:`, sessionId)
+      // console.log(`Action completed, session ID:`, sessionId)
     } catch (error) {
       console.error('Action failed:', error)
     }

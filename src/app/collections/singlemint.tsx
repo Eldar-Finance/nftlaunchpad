@@ -105,10 +105,10 @@ export default function SingleCollectionMint({ collectionId, onBackClick }: Sing
       console.error('Selected token cost not found');
       return;
     }
-    console.log('totalCost', selectedCost.amount);
+    // console.log('totalCost', selectedCost.amount);
     const totalCost = selectedCost.amount * mintAmount;
     const newtotal = (totalCost / 1e18 );
-    console.log('totalCost', newtotal);
+    // console.log('totalCost', newtotal);
 
     // Prepare hex arguments
     const mintAmountHex = ensureEvenHex(mintAmount.toString(16));
@@ -149,7 +149,7 @@ export default function SingleCollectionMint({ collectionId, onBackClick }: Sing
         }
       });
 
-      console.log('Minting initiated, session ID:', sessionId);
+      // console.log('Minting initiated, session ID:', sessionId);
     } catch (error) {
       console.error('Minting failed:', error);
     }

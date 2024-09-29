@@ -51,7 +51,7 @@ export const useGetMinterInformation = (connectedAddress: string) => {
         }
       });
       
-      //console.log('Bech32 Addresses:', bech32Addresses);
+      // console.log('Bech32 Addresses:', bech32Addresses);
       setMinterInfo(bech32Addresses); // Update state with Bech32 addresses
 
       const endpointDefinition = minterSc.getEndpoint('getAddressMinters'); // Update endpoint definition

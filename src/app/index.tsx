@@ -39,10 +39,10 @@ const AppContent = ({ children }: PropsWithChildren) => {
           // component: TransactionsTracker,
           props: {
             onSuccess: (sessionId: string) => {
-              console.log(`Session ${sessionId} successfully completed`);
+              // console.log(`Session ${sessionId} successfully completed`);
             },
             onFail: (sessionId: string, errorMessage: string) => {
-              console.log(`Session ${sessionId} failed. ${errorMessage ?? ''}`);
+              // console.log(`Session ${sessionId} failed. ${errorMessage ?? ''}`);
             }
           }
         }
