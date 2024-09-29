@@ -36,7 +36,7 @@ export default function LandingPage() {
 
       {/* Hero Section with 3D NFT Sculpture */}
       <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
-        <div className="absolute inset-0 z-10">
+        <div className="absolute inset-0 z-0">
           <Canvas camera={{ position: [0, 0, 5] }}>
             <ambientLight intensity={0.2} />
             <pointLight position={[10, 10, 10]} intensity={0.8} />
@@ -46,7 +46,7 @@ export default function LandingPage() {
           </Canvas>
         </div>
         <motion.div 
-          className="container mx-auto px-4 z-20 text-center"
+          className="container mx-auto px-4 z-20 text-center relative"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 1 }}
