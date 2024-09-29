@@ -1,5 +1,6 @@
 'use client'
 
+import { useState } from 'react'
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
@@ -7,7 +8,8 @@ import { Label } from "@/components/ui/label"
 import { 
   Tag, Image as ImageIcon, Hash, DollarSign, 
   LayoutGrid, Users, Pause, Play, RefreshCw,
- Fingerprint, CheckCircle, XCircle, Plus, Minus
+  Fingerprint, CheckCircle, XCircle, Plus, Minus,
+  ChevronDown, ChevronUp
 } from 'lucide-react'
 import { useGetCollectionsInfo } from '@/hooks/useGetCollectionsInfo'
 import { Address, TokenIdentifierValue } from '@multiversx/sdk-core/out'
@@ -19,7 +21,6 @@ import {
 } from '@/hooks/sdkDappHooks'
 import { GAS_PRICE, VERSION } from '@/localConstants'
 import { useRouter } from 'next/navigation'
-import { useState } from 'react'
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import BigNumber from 'bignumber.js'
@@ -51,6 +52,7 @@ export default function CollectionManager({ collectionAddress }: { collectionAdd
   const [maxMints, setMaxMints] = useState('')
   const [costs, setCosts] = useState<Cost[]>([])
   const [whitelist, setWhitelist] = useState('')
+  const [showCreatePhase, setShowCreatePhase] = useState(false)
 
   const handleAddCost = () => {
     setCosts([...costs, { token: new TokenIdentifierValue(''), amount: new BigNumber(0) }])
@@ -254,88 +256,126 @@ export default function CollectionManager({ collectionAddress }: { collectionAdd
 
           <Card className="bg-gray-800 border-gray-700">
             <CardHeader>
+              <CardTitle className="text-xl font-semibold text-white">Current Phase Details</CardTitle>
+            </CardHeader>
+            <CardContent className="grid grid-cols-2 gap-4">
+              <InfoCard
+                icon={<Tag className="w-5 h-5 text-blue-400" />}
+                label="Phase Name"
+                value={info.phaseName || "N/A"}
+              />
+              <InfoCard
+                icon={<LayoutGrid className="w-5 h-5 text-green-400" />}
+                label="Max Mints"
+                value={info.maxMints?.toString() || "N/A"}
+              />
+              <InfoCard
+                icon={<Hash className="w-5 h-5 text-yellow-400" />}
+                label="Minted"
+                value={info.minted?.toString() || "N/A"}
+              />
+              <InfoCard
+                icon={<Users className="w-5 h-5 text-purple-400" />}
+                label="Whitelist Only"
+                value={info.isPhaseWlOnly ? "Yes" : "No"}
+              />
+            </CardContent>
+          </Card>
+
+          <Card className="bg-gray-800 border-gray-700">
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-xl font-semibold text-white">Create New Phase</CardTitle>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setShowCreatePhase(!showCreatePhase)}
+                className="bg-gray-700 hover:bg-gray-600 text-white border-gray-600"
+              >
+                {showCreatePhase ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+              </Button>
             </CardHeader>
             <CardContent>
-              <form onSubmit={handleCreatePhase} className="space-y-4">
-                <div>
-                  <Label htmlFor="phaseName">Phase Name (max 50 characters)</Label>
-                  <Input
-                    id="phaseName"
-                    value={phaseName}
-                    onChange={(e) => setPhaseName(e.target.value.slice(0, 50))}
-                    maxLength={50}
-                    className="bg-gray-700 text-white border-gray-600"
-                  />
-                </div>
-                <div className="grid grid-cols-2 gap-4">
+              {showCreatePhase && (
+                <form onSubmit={handleCreatePhase} className="space-y-4">
                   <div>
-                    <Label htmlFor="userMaxMints">User Max Mints</Label>
+                    <Label htmlFor="phaseName">Phase Name (max 50 characters)</Label>
                     <Input
-                      id="userMaxMints"
-                      type="number"
-                      min="1"
-                      step="1"
-                      value={userMaxMints}
-                      onChange={(e) => setUserMaxMints(e.target.value)}
+                      id="phaseName"
+                      value={phaseName}
+                      onChange={(e) => setPhaseName(e.target.value.slice(0, 50))}
+                      maxLength={50}
                       className="bg-gray-700 text-white border-gray-600"
                     />
                   </div>
-                  <div>
-                    <Label htmlFor="maxMints">Max Mints</Label>
-                    <Input
-                      id="maxMints"
-                      type="number"
-                      min="1"
-                      step="1"
-                      value={maxMints}
-                      onChange={(e) => setMaxMints(e.target.value)}
-                      className="bg-gray-700 text-white border-gray-600"
-                    />
-                  </div>
-                </div>
-                <div>
-                  <Label>Costs</Label>
-                  {costs.map((cost, index) => (
-                    <div key={index} className="flex items-center space-x-2 mt-2">
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <Label htmlFor="userMaxMints">User Max Mints</Label>
                       <Input
-                        placeholder="Token Identifier"
-                        value={cost.token.toString()}
-                        onChange={(e) => handleCostChange(index, 'token', e.target.value)}
-                        className="bg-gray-700 text-white border-gray-600"
-                      />
-                      <Input
+                        id="userMaxMints"
                         type="number"
-                        step="0.000000000000000001"
-                        placeholder="Amount"
-                        value={cost.amount.toString()}
-                        onChange={(e) => handleCostChange(index, 'amount', e.target.value)}
+                        min="1"
+                        step="1"
+                        value={userMaxMints}
+                        onChange={(e) => setUserMaxMints(e.target.value)}
                         className="bg-gray-700 text-white border-gray-600"
                       />
-                      <Button type="button" onClick={() => handleRemoveCost(index)} className="bg-red-600 hover:bg-red-700">
-                        <Minus className="w-4 h-4" />
-                      </Button>
                     </div>
-                  ))}
-                  <Button type="button" onClick={handleAddCost} className="mt-2 bg-green-600 hover:bg-green-700">
-                    <Plus className="w-4 h-4 mr-2" /> Add Cost
+                    <div>
+                      <Label htmlFor="maxMints">Max Mints</Label>
+                      <Input
+                        id="maxMints"
+                        type="number"
+                        min="1"
+                        step="1"
+                        value={maxMints}
+                        onChange={(e) => setMaxMints(e.target.value)}
+                        className="bg-gray-700 text-white border-gray-600"
+                      />
+                    </div>
+                  </div>
+                  <div>
+                    <Label>Costs</Label>
+                    {costs.map((cost, index) => (
+                      <div key={index} className="flex items-center space-x-2 mt-2">
+                        <Input
+                          placeholder="Token Identifier"
+                          value={cost.token.toString()}
+                          onChange={(e) => handleCostChange(index, 'token', e.target.value)}
+                          className="bg-gray-700 text-white border-gray-600"
+                        />
+                        <Input
+                          type="number"
+                          step="0.000000000000000001"
+                          placeholder="Amount"
+                          value={cost.amount.toString()}
+                          onChange={(e) => handleCostChange(index, 'amount', e.target.value)}
+                          className="bg-gray-700 text-white border-gray-600"
+                        />
+                        <Button type="button" onClick={() => handleRemoveCost(index)} className="bg-red-600 hover:bg-red-700">
+                          <Minus className="w-4 h-4" />
+                        </Button>
+                      </div>
+                    ))}
+                    <Button type="button" onClick={handleAddCost} className="mt-2 bg-green-600 hover:bg-green-700">
+                      <Plus className="w-4 h-4 mr-2" /> Add Cost
+                    </Button>
+                  </div>
+                  <div>
+                    <Label htmlFor="whitelist">Whitelist (one address per line)</Label>
+                    <Textarea
+                      id="whitelist"
+                      value={whitelist}
+                      onChange={(e) => setWhitelist(e.target.value)}
+                      className="bg-gray-700 text-white border-gray-600"
+                      placeholder="erd1..."
+                      rows={5}
+                    />
+                  </div>
+                  <Button type="submit" className="w-full bg-blue-600 hover:bg-blue-700">
+                    Create Phase
                   </Button>
-                </div>
-                <div>
-                  <Label htmlFor="whitelist">Whitelist (one address per line)</Label>
-                  <Textarea
-                    id="whitelist"
-                    value={whitelist}
-                    onChange={(e) => setWhitelist(e.target.value)}
-                    className="bg-gray-700 text-white border-gray-600"
-                    placeholder="erd1..."
-                    rows={5}
-                  />
-                </div>
-                <Button type="submit" className="w-full bg-blue-600 hover:bg-blue-700">
-                  Create Phase
-                </Button>
-              </form>
+                </form>
+              )}
             </CardContent>
           </Card>
 
