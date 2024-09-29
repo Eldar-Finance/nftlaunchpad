@@ -122,7 +122,7 @@ export default function SingleCollectionMint({ collectionId, onBackClick }: Sing
     }
 
     const mintTransaction = newTransaction({
-      value: selectedToken === 'EGLD' ? totalCost : 0,
+      value: selectedToken === 'EGLD' ? totalCost :0,
       data: hexArguments,
       receiver: collectionId,
       gasLimit: 20000000,
