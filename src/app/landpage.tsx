@@ -51,17 +51,17 @@ export default function LandingPage() {
         <div className="absolute inset-0 flex items-center justify-center" style={{ pointerEvents: 'none' }}>
           <div className="container mx-auto px-4 text-center" style={{ pointerEvents: 'auto' }}>
             <h1 className="text-7xl md:text-9xl font-extrabold mb-6 bg-gradient-to-r from-cyan-400 via-blue-500 to-purple-600 bg-clip-text text-transparent">
-              QuantumX
+              QuantumX Launcher
             </h1>
             <p className="text-2xl md:text-4xl text-gray-400 mb-8" style={{ textShadow: '0 0 5px rgba(0,0,0,0.5)' }}>
-              Next-Gen NFT Launchpad
+              Next-Gen NFT Collection Launcher
             </p>
             <Button
               size="lg"
               className="bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-600 hover:to-blue-600 text-black font-bold transition-all duration-300 transform hover:-translate-y-1 hover:shadow-xl text-lg px-8 py-4"
               onClick={() => setIsModalOpen(true)}
             >
-              Launch NFT
+              Launch NFT Collection
             </Button>
           </div>
         </div>
