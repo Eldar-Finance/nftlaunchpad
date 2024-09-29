@@ -207,12 +207,22 @@
             ]
         },
         {
-            "name": "getMintersAndCreators",
+            "docs": [
+                "Returns all live minters with the following information:",
+                "- Minter address",
+                "- Collection name",
+                "- Collection Description",
+                "- IPFS CID",
+                "- Minted",
+                "- Max Supply",
+                "- Costs"
+            ],
+            "name": "getLiveMinters",
             "mutability": "readonly",
             "inputs": [],
             "outputs": [
                 {
-                    "type": "variadic<multi<Address,Address>>",
+                    "type": "variadic<multi<Address,variadic<bytes>,variadic<u64>,variadic<multi<EgldOrEsdtTokenIdentifier,BigUint>>>>",
                     "multi_result": true
                 }
             ]

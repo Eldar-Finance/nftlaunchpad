@@ -1,16 +1,21 @@
-/* eslint-disable @typescript-eslint/no-unused-vars, @typescript-eslint/no-explicit-any */
-
 "use client"
 
-import { useState, useRef } from 'react'
+import { useState, useRef, useEffect, useMemo } from 'react'
 import { motion, useScroll, useTransform, AnimatePresence } from 'framer-motion'
-import { Canvas, useFrame } from '@react-three/fiber'
-import { OrbitControls, Text, Environment, MeshTransmissionMaterial } from '@react-three/drei'
+import { Canvas, useFrame, useThree } from '@react-three/fiber'
+import { OrbitControls, Text, Environment } from '@react-three/drei'
 import * as THREE from 'three'
 import Link from 'next/link'
 import { Button } from "@/components/ui/button"
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
-import { Palette, Code, Rocket, CreditCard } from 'lucide-react'
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog"
+import { Palette, Code, Rocket, CreditCard, Users, Image as ImageIcon, DollarSign } from 'lucide-react'
+import { InstancedMesh } from 'three'
 
 const features = [
   { title: 'Create', description: 'Launch unique NFT collections', icon: Palette },
@@ -18,6 +23,17 @@ const features = [
   { title: 'Mint', description: 'Seamless minting experience', icon: Rocket },
   { title: 'Manage', description: 'Set and track royalties', icon: CreditCard },
 ]
+
+// Add this above your existing code
+const StepItem = ({ number, title, description }: { number: number; title: string; description: string }) => (
+  <div>
+    <span>{number}. </span>
+    <h3>{title}</h3>
+    <p>{description}</p>
+  </div>
+);
+
+
 
 export default function LandingPage() {
   const [isModalOpen, setIsModalOpen] = useState(false)
@@ -27,44 +43,67 @@ export default function LandingPage() {
     offset: ["start start", "end start"]
   })
 
+  const backgroundY = useTransform(scrollYProgress, [0, 1], ["0%", "100%"])
   const textY = useTransform(scrollYProgress, [0, 0.5, 1], ["0%", "50%", "100%"])
 
   return (
     <div ref={containerRef} className="min-h-screen text-white overflow-hidden">
       {/* Dynamic Background */}
-   
+      <motion.div 
+        className="fixed inset-0 z-0"
+        style={{
+          background: "radial-gradient(circle at center, #080808 0%, #050505 50%, #000000 100%)",
+          y: backgroundY
+        }}
+      />
 
-      {/* Hero Section with 3D NFT Sculpture */}
-      <section className="relative min-h-screen overflow-hidden">
-        {/* 3D Background */}
-        <div className="absolute inset-0">
-          <Canvas camera={{ position: [0, 0, 5] }}>
-            <ambientLight intensity={0.2} />
-            <pointLight position={[10, 10, 10]} intensity={0.8} />
-            <NFTSculpture />
+      {/* Hero Section with 3D Lightning Thunder */}
+      <section className="relative min-h-screen flex flex-col items-center justify-center overflow-hidden">
+        <div className="absolute inset-0 z-10">
+          <Canvas camera={{ position: [0, 0, 5], fov: 75 }}>
+            <ambientLight intensity={0.1} />
+            <pointLight position={[10, 10, 10]} intensity={0.3} />
+            <LightningThunder />
             <Environment preset="night" />
             <OrbitControls enableZoom={false} enablePan={false} enableRotate={true} />
           </Canvas>
         </div>
-        
-        {/* Content Overlay */}
-        <div className="absolute inset-0 flex items-center justify-center" style={{ pointerEvents: 'none' }}>
-          <div className="container mx-auto px-4 text-center" style={{ pointerEvents: 'auto' }}>
-            <h1 className="text-7xl md:text-9xl font-extrabold mb-6 bg-gradient-to-r from-cyan-400 via-blue-500 to-purple-600 bg-clip-text text-transparent">
-              QuantumX Launcher
-            </h1>
-            <p className="text-2xl md:text-4xl text-gray-400 mb-8" style={{ textShadow: '0 0 5px rgba(0,0,0,0.5)' }}>
-              Next-Gen NFT Collection Launcher
-            </p>
-            <Button
-              size="lg"
-              className="bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-600 hover:to-blue-600 text-black font-bold transition-all duration-300 transform hover:-translate-y-1 hover:shadow-xl text-lg px-8 py-4"
-              onClick={() => setIsModalOpen(true)}
+        <motion.div 
+          className="container mx-auto px-4 z-20 text-center relative"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 1 }}
+        >
+          <div className="backdrop-blur-md p-8 rounded-xl">
+            <motion.h1 
+              className="text-6xl md:text-8xl font-extrabold mb-4 bg-clip-text text-blue-500"
+              style={{ y: textY }}
             >
-              Launch NFT Collection
-            </Button>
+              QuantumX
+            </motion.h1>
+            <motion.p 
+              className="text-xl md:text-3xl text-gray-200 mb-8"
+              initial={{ y: 50, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              transition={{ duration: 0.8, delay: 0.4 }}
+            >
+              Next-Gen NFT Launchpad
+            </motion.p>
+            <motion.div
+              initial={{ y: 50, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              transition={{ duration: 0.8, delay: 0.6 }}
+            >
+              <Button
+                size="lg"
+                className="bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-600 hover:to-blue-600 text-black font-bold transition-all duration-300 transform hover:-translate-y-1 hover:shadow-xl text-lg px-8 py-4"
+                onClick={() => setIsModalOpen(true)}
+              >
+                Launch NFT
+              </Button>
+            </motion.div>
           </div>
-        </div>
+        </motion.div>
       </section>
 
       {/* Features Section with Minimalist Design */}
@@ -84,7 +123,7 @@ export default function LandingPage() {
         <div className="container mx-auto px-4">
           <h2 className="text-3xl md:text-4xl font-bold text-center mb-16 text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-500">Platform Stats</h2>
           <div className="h-[400px] w-full">
-            <Canvas>
+            <Canvas camera={{ position: [0, 0, 3], fov: 50 }}>
               <ambientLight intensity={0.2} />
               <pointLight position={[10, 10, 10]} intensity={0.8} />
               <HolographicStats />
@@ -152,36 +191,81 @@ export default function LandingPage() {
   )
 }
 
-function NFTSculpture() {
-  const mesh = useRef<THREE.Mesh>(null)
+function LightningThunder() {
+  const count = 5000
+  const mesh = useRef<InstancedMesh>(null)
+  const light = useRef<THREE.PointLight>(null)
+  const { viewport, camera } = useThree()
+
+  const dummy = useMemo(() => new THREE.Object3D(), [])
+  const particles = useMemo(() => {
+    const temp = []
+    for (let i = 0; i < count; i++) {
+      const t = Math.random() * 100
+      const factor = 20 + Math.random() * 100
+      const speed = 0.01 + Math.random() / 200
+      const xFactor = -50 + Math.random() * 100
+      const yFactor = -50 + Math.random() * 100
+      const zFactor = -50 + Math.random() * 100
+      temp.push({ t, factor, speed, xFactor, yFactor, zFactor, mx: 0, my: 0 })
+    }
+    return temp
+  }, [count])
+
+  const particlesGeometry = useMemo(() => {
+    const geometry = new THREE.BufferGeometry()
+    const positions = new Float32Array(count * 3)
+    geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3))
+    return geometry
+  }, [count])
+
   useFrame((state) => {
-    const time = state.clock.getElapsedTime()
-    mesh.current!.rotation.x = Math.sin(time / 4)
-    mesh.current!.rotation.y = Math.sin(time / 2)
-    mesh.current!.position.y = Math.sin(time / 1.5) / 2
+    particles.forEach((particle, i) => {
+      let { t, factor, speed, xFactor, yFactor, zFactor } = particle
+      t = particle.t += speed / 2
+      const a = Math.cos(t) + Math.sin(t * 1) / 10
+      const b = Math.sin(t) + Math.cos(t * 2) / 10
+      const s = Math.min(Math.cos(t), Math.sin(t), 0.5)
+
+      particle.mx += (state.mouse.x * viewport.width - particle.mx) * 0.02
+      particle.my += (state.mouse.y * viewport.height - particle.my) * 0.02
+
+      dummy.position.set(
+        (particle.mx / 10) * a + xFactor + Math.cos((t / 10) * factor) + (Math.sin(t * 1) * factor) / 10,
+        (particle.my / 10) * b + yFactor + Math.sin((t / 10) * factor) + (Math.cos(t * 2) * factor) / 10,
+        (particle.my / 10) * b + zFactor + Math.cos((t / 10) * factor) + (Math.sin(t * 3) * factor) / 10
+      )
+      dummy.scale.set(s, s, s)
+      dummy.updateMatrix()
+      ;(mesh.current as InstancedMesh)?.setMatrixAt(i, dummy.matrix)
+    })
+    if (mesh.current) {
+      mesh.current.instanceMatrix.needsUpdate = true
+    }
+
+    // Animate lightning effect
+    if (light.current) {
+      light.current.intensity = 0.1 + Math.random() * 0.5
+      light.current.position.set(
+        Math.sin(state.clock.elapsedTime * 2) * 3,
+        Math.cos(state.clock.elapsedTime * 2) * 3,
+        Math.sin(state.clock.elapsedTime) * 3
+      )
+    }
   })
 
   return (
-    <mesh ref={mesh}>
-      <torusKnotGeometry args={[1, 0.3, 100, 16]} />
-      <MeshTransmissionMaterial
-        backside
-        samples={16}
-        thickness={0.5}
-        chromaticAberration={1}
-        anisotropy={0.3}
-        distortion={0.5}
-        distortionScale={0.5}
-        temporalDistortion={0.1}
-        iridescence={1}
-        iridescenceIOR={1}
-        iridescenceThicknessRange={[0, 1400]}
-      />
-    </mesh>
+    <>
+      <instancedMesh ref={mesh} args={[undefined, undefined, count]} frustumCulled={false}>
+        <dodecahedronGeometry args={[0.2, 0]} />
+        <meshPhongMaterial color="#00ffff" />
+      </instancedMesh>
+      <pointLight ref={light} distance={10} intensity={1} color="#00ffff" />
+    </>
   )
 }
 
-function FeatureCard({ feature, index }: { feature: any, index: any }) {
+function FeatureCard({ feature, index }: { feature: any; index: number }) {
   return (
     <motion.div
       className="relative bg-gray-900 bg-opacity-50 backdrop-blur-lg border border-gray-800 rounded-xl p-6 overflow-hidden"
@@ -210,19 +294,7 @@ function HolographicStats() {
         <group key={index} position={[index * 1.5 - 1.5, 0, 0]}>
           <mesh>
             <cylinderGeometry args={[0.4, 0.4, stat.value / 200000, 32]} />
-            <MeshTransmissionMaterial
-              backside
-              samples={16}
-              thickness={0.5}
-              chromaticAberration={1}
-              anisotropy={0.3}
-              distortion={0.5}
-              distortionScale={0.5}
-              temporalDistortion={0.1}
-              color={stat.color}
-              attenuationDistance={0.5}
-              attenuationColor="#ffffff"
-            />
+            <meshPhongMaterial color={stat.color} transparent opacity={0.6} />
           </mesh>
           <Text
             position={[0, stat.value / 400000 + 0.3, 0]}
@@ -247,15 +319,3 @@ function HolographicStats() {
     </group>
   )
 }
-
-const StepItem = ({ number, title, description }: { number: any, title: any, description: any }) => (
-  <div className="flex items-start">
-    <div className="flex-shrink-0 w-8 h-8 rounded-full bg-gradient-to-r from-cyan-500 to-blue-500 flex items-center justify-center mr-4 mt-1">
-      <span className="text-black font-bold text-sm">{number}</span>
-    </div>
-    <div>
-      <h3 className="text-xl font-semibold mb-1 text-cyan-400">{title}</h3>
-      <p className="text-gray-400 text-sm">{description}</p>
-    </div>
-  </div>
-)
