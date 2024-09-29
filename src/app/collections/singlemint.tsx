@@ -125,7 +125,7 @@ export default function SingleCollectionMint({ collectionId, onBackClick }: Sing
       value: selectedToken === 'EGLD' ? totalCost :0,
       data: hexArguments,
       receiver: collectionId,
-      gasLimit: 20000000,
+      gasLimit: 20000000 ,
       gasPrice: GAS_PRICE,
       chainID: network.chainId,
       nonce: nonce,
