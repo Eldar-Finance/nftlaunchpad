@@ -9,7 +9,7 @@ import {
   Tag, Image as ImageIcon, Hash, DollarSign, 
   LayoutGrid, Users, Pause, Play, RefreshCw,
   Fingerprint, CheckCircle, XCircle, Plus, Minus,
-  ChevronDown, ChevronUp, PlusCircle
+  ChevronUp, PlusCircle
 } from 'lucide-react'
 import { useGetCollectionsInfo } from '@/hooks/useGetCollectionsInfo'
 import { Address, TokenIdentifierValue } from '@multiversx/sdk-core/out'
