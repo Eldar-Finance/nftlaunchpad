@@ -36,6 +36,7 @@ export default function LandingPage() {
 
       {/* Hero Section with 3D NFT Sculpture */}
       <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
+        {/* 3D Background */}
         <div className="absolute inset-0 z-0">
           <Canvas camera={{ position: [0, 0, 5] }}>
             <ambientLight intensity={0.2} />
@@ -45,40 +46,45 @@ export default function LandingPage() {
             <OrbitControls enableZoom={false} enablePan={false} enableRotate={true} />
           </Canvas>
         </div>
-        <motion.div 
-          className="container mx-auto px-4 z-20 text-center relative"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 1 }}
-        >
-          <motion.h1 
-            className="text-7xl md:text-9xl font-extrabold mb-6 bg-gradient-to-r from-cyan-400 via-blue-500 to-purple-600 bg-clip-text text-transparent"
-            style={{ y: textY }}
+        
+        {/* Content Overlay */}
+        <div className="absolute inset-0 z-10 flex items-center justify-center pointer-events-none">
+          <motion.div 
+            className="container mx-auto px-4 text-center"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 1 }}
           >
-            QuantumX
-          </motion.h1>
-          <motion.p 
-            className="text-2xl md:text-4xl text-gray-400 mb-8"
-            initial={{ y: 50, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
-            transition={{ duration: 0.8, delay: 0.4 }}
-          >
-            Next-Gen NFT Launchpad
-          </motion.p>
-          <motion.div
-            initial={{ y: 50, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
-            transition={{ duration: 0.8, delay: 0.6 }}
-          >
-            <Button
-              size="lg"
-              className="bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-600 hover:to-blue-600 text-black font-bold transition-all duration-300 transform hover:-translate-y-1 hover:shadow-xl text-lg px-8 py-4"
-              onClick={() => setIsModalOpen(true)}
+            <motion.h1 
+              className="text-7xl md:text-9xl font-extrabold mb-6 bg-gradient-to-r from-cyan-400 via-blue-500 to-purple-600 bg-clip-text text-transparent"
+              style={{ y: textY }}
             >
-              Launch NFT
-            </Button>
+              QuantumX
+            </motion.h1>
+            <motion.p 
+              className="text-2xl md:text-4xl text-gray-400 mb-8"
+              initial={{ y: 50, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              transition={{ duration: 0.8, delay: 0.4 }}
+            >
+              Next-Gen NFT Launchpad
+            </motion.p>
+            <motion.div
+              className="pointer-events-auto"
+              initial={{ y: 50, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              transition={{ duration: 0.8, delay: 0.6 }}
+            >
+              <Button
+                size="lg"
+                className="bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-600 hover:to-blue-600 text-black font-bold transition-all duration-300 transform hover:-translate-y-1 hover:shadow-xl text-lg px-8 py-4"
+                onClick={() => setIsModalOpen(true)}
+              >
+                Launch NFT
+              </Button>
+            </motion.div>
           </motion.div>
-        </motion.div>
+        </div>
       </section>
 
       {/* Features Section with Minimalist Design */}
