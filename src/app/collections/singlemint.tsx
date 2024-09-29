@@ -117,7 +117,7 @@ export default function SingleCollectionMint({ collectionId, onBackClick }: Sing
     // Construct hexArguments
     let hexArguments;
     if (selectedToken === 'EGLD') {
-      hexArguments = `mint@${collectionIdentifier}@${mintAmountHex}`;
+      hexArguments = `mint@@${mintAmountHex}`;
     } else {
       hexArguments = `ESDTTransfer@${tokenIdentifierHex}@${totalCostHex}@mint@${collectionIdentifier}@${mintAmountHex}`;
     }
