@@ -15,7 +15,7 @@ import { Address } from '@multiversx/sdk-core'
 import { GAS_PRICE, VERSION } from '@/localConstants'
 import { newTransaction } from '@/helpers/sdkDappHelpers'
 import { signAndSendTransactions } from '@/helpers/signAndSendTransactions'
-import { useGetAccountInfo } from '@multiversx/sdk-dapp/hooks'
+import { useGetAccountInfo,useGetNetworkConfig } from '@multiversx/sdk-dapp/hooks'
 
 
 interface CollectionInfo {
