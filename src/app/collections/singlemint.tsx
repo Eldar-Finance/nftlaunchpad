@@ -103,8 +103,15 @@ export default function SingleCollectionMint({ collectionId, onBackClick }: Sing
 
   const getMaxMintAmount = () => {
     if (!collectionData) return 1;
-    const remainingMints = isNaN(collectionData.maxMints - collectionData.minted) ? 0 : collectionData.maxMints - collectionData.minted;
-    const userRemainingMints = isNaN(collectionData.userMaxMints - collectionData.userMinted) ? 0 : collectionData.userMaxMints - collectionData.userMinted;
+
+    const remainingMints = isNaN(collectionData.minted) 
+      ? collectionData.maxMints 
+      : collectionData.maxMints - collectionData.minted;
+
+    const userRemainingMints = isNaN(collectionData.userMaxMints)
+      ? Infinity
+      : collectionData.userMaxMints - (isNaN(collectionData.userMinted) ? 0 : collectionData.userMinted);
+
     return Math.min(50, remainingMints, userRemainingMints, collectionData.maxAmountPerMint);
   }
 
