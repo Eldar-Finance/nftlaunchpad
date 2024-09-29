@@ -145,7 +145,7 @@ export default function SingleCollectionMint({ collectionId, onBackClick }: Sing
   const imageUrl = `https://ipfs.io/ipfs/${collectionData.ipfsCid}/${randomImageNumber}.${collectionData.fileEnding}`
 
   return (
-    <div className="min-h-screen bg-transparenttext-gray-200 p-8 overflow-hidden">
+    <div className="min-h-screen bg-transparent text-gray-200 p-8 overflow-hidden">
       <motion.div 
         className="flex items-center justify-between mb-12"
         initial={{ opacity: 0, y: -50 }}
@@ -324,7 +324,9 @@ export default function SingleCollectionMint({ collectionId, onBackClick }: Sing
               </p>
 
               <p className="text-md text-gray-300">
-                {isNaN(collectionData.userMaxMints) || isNaN(collectionData.userMinted) ? "You can mint as many as you want" : `You have ${collectionData.userMaxMints - collectionData.userMinted} NFTs left to mint.`}
+                {isNaN(collectionData.userMaxMints) && isNaN(collectionData.userMinted) ? "You can mint as many as you want" : 
+                isNaN(collectionData.userMinted) ? `You can mint ${collectionData.userMaxMints}` : 
+                `You have ${collectionData.userMaxMints - collectionData.userMinted} NFTs left to mint.`}
               </p>
 
               {collectionData.isPhaseWlOnly && (
@@ -357,7 +359,7 @@ export default function SingleCollectionMint({ collectionId, onBackClick }: Sing
                 <div className="flex justify-between items-center">
                   <div className="flex items-center">
                     <Hash className="w-5 h-5 mr-2 text-green-400" />
-                    <span className="text-gray-400">Max Mints</span>
+                    <span className="text-gray-400">Max Mints Current Phase</span>
                   </div>
                   <span className="text-white">{collectionData.maxMints || 'N/A'}</span>
                 </div>
