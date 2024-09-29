@@ -202,7 +202,7 @@ export default function SingleCollectionMint({ collectionId, onBackClick }: Sing
               <div className="flex justify-between items-center">
                 <div className="flex items-center mt-6">
                   <Users className="w-6 h-6 mr-2 text-blue-400" />
-                  <span className="text-white text-lg">{collectionData.totalNftsMinted} / {collectionData.maxSupply} Minted</span>
+                  <span className="text-white text-lg">{isNaN(collectionData.totalNftsMinted) ? 0 : collectionData.totalNftsMinted} / {collectionData.maxSupply} Minted</span>
                 </div>
                 <TooltipProvider>
                   <Tooltip>
@@ -216,12 +216,13 @@ export default function SingleCollectionMint({ collectionId, onBackClick }: Sing
                 </TooltipProvider>
               </div>
 
-              <div className="flex justify-between items-center">
-                <Coins className="w-4 h-4 mr-1 text-yellow-400" />
-              <span className="text-white text-md">Mint Token</span>
-          
+              <div className="space-y-2">
+                <div className="flex items-center">
+                  <Coins className="w-6 h-6 mr-2 text-yellow-400" />
+                  <span className="text-white text-lg">Mint Token</span>
+                </div>
                 <Select value={selectedToken} onValueChange={setSelectedToken}>
-                  <SelectTrigger className="w-[90px]">
+                  <SelectTrigger className="w-full">
                     <SelectValue placeholder="Select token" />
                   </SelectTrigger>
                   <SelectContent className="bg-gray-800 text-white">
