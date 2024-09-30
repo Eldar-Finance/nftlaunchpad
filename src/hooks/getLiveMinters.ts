@@ -75,7 +75,7 @@ export const useGetLiveMinters = () => {
     };
 
     fetchLiveMinters();
-  }, []);
+  }, [network.apiAddress]); // Add dependency array with network.apiAddress
 
   return { liveMinters, isLoading };
 };

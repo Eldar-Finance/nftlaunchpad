@@ -2,7 +2,7 @@
 
 "use client"
 
-import { useState, useRef } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import { motion, useScroll, useTransform, AnimatePresence } from 'framer-motion'
 import { Canvas, useFrame } from '@react-three/fiber'
 import { OrbitControls, Text, Environment, MeshTransmissionMaterial } from '@react-three/drei'
@@ -21,13 +21,27 @@ const features = [
 
 export default function LandingPage() {
   const [isModalOpen, setIsModalOpen] = useState(false)
-  const containerRef = useRef(null)
+  const containerRef = useRef<HTMLDivElement>(null)
   const { scrollYProgress } = useScroll({
     target: containerRef,
     offset: ["start start", "end start"]
   })
 
   const textY = useTransform(scrollYProgress, [0, 0.5, 1], ["0%", "50%", "100%"])
+
+  useEffect(() => {
+    // Any DOM manipulations or event listener additions should go here
+    // For example:
+    // const container = containerRef.current
+    // if (container) {
+    //   // Add event listeners or perform DOM manipulations
+    // }
+
+    // Cleanup function
+    return () => {
+      // Remove event listeners or cleanup DOM manipulations
+    }
+  }, []) // Empty dependency array means this effect runs once on mount and cleanup on unmount
 
   return (
     <div ref={containerRef} className="min-h-screen text-white overflow-hidden">
