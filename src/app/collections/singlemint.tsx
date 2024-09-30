@@ -33,6 +33,7 @@ interface CollectionInfo {
   maxSupply: number;
   maxAmountPerMint: number;
   totalNftsMinted: number;
+  fee: number;
   hasJsonMetadata: boolean;
   isMintingEnabled: boolean;
   isPaused: boolean;
@@ -107,7 +108,8 @@ export default function SingleCollectionMint({ collectionId, onBackClick }: Sing
     }
     // console.log('totalCost', selectedCost.amount);
     const totalCost = selectedCost.amount * mintAmount;
-    const newtotal = (totalCost / 1e18 );
+    const totalCostWithFee = totalCost + (totalCost * collectionData.fee / 100);
+    const newtotal = (totalCostWithFee / 1e18 );
     // console.log('totalCost', newtotal);
 
     // Prepare hex arguments

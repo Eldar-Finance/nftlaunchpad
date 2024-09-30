@@ -24,6 +24,7 @@ interface CollectionInfo {
   maxSupply: number;
   maxAmountPerMint: number;
   totalNftsMinted: number;
+  fee: number;
   hasJsonMetadata: boolean;
   isMintingEnabled: boolean;
   isPaused: boolean;
@@ -90,17 +91,18 @@ export const useGetCollectionsInfo = (collectionAddresses: string[]) => {
             userMinted: hexToDecimal(decodedData[16]),
             maxMints: hexToDecimal(decodedData[17]),
             minted: hexToDecimal(decodedData[18]),
-            hasJsonMetadata: decodedData[19] === '01',
-            isMintingEnabled: decodedData[20] === '01',
-            isPaused: decodedData[21] === '01',
-            isPhaseWlOnly: decodedData[22] === '01',
-            canUserTryToMint: decodedData[23] === '01',
+            fee:hexToDecimal(decodedData[19]),
+            hasJsonMetadata: decodedData[20] === '01',
+            isMintingEnabled: decodedData[21] === '01',
+            isPaused: decodedData[22] === '01',
+            isPhaseWlOnly: decodedData[23] === '01',
+            canUserTryToMint: decodedData[24] === '01',
             mintCosts: decodedData // decodedData from 24 to end comes in 2-tuples of tokenIdentifier and amount
-              .slice(24)
+              .slice(25)
               .filter((_, index) => index % 2 === 0)
               .map((tokenIdentifier, index) => ({
                 tokenIdentifier: hexToString(tokenIdentifier),
-                amount: hexToDecimal(decodedData[24 + index * 2 + 1])
+                amount: hexToDecimal(decodedData[25 + index * 2 + 1])
               })
             )
           };
