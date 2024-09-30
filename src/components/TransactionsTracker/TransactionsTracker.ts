@@ -10,7 +10,7 @@ export const TransactionsTracker = () => {
     },
     onFail: (sessionId: string, errorMessage?: string) => {
       if (errorMessage) {
-         // console.log(`Session ${sessionId} failed, ${errorMessage}`);
+          console.log(`Session ${sessionId} failed, ${errorMessage}`);
         return;
       }
 
@@ -22,11 +22,11 @@ export const TransactionsTracker = () => {
   // By doing this it will enable the tracker but without the sendTransactions logic
   useBatchTransactionsTracker({
     onSuccess: (sessionId) => {
-       // console.log(`Batch with session ${sessionId} successfully completed`);
+        console.log(`Batch with session ${sessionId} successfully completed`);
     },
     onFail: (sessionId, errorMessage) => {
       if (errorMessage) {
-         // console.log(`Batch with session ${sessionId} failed, ${errorMessage}`);
+         //console.log(`Batch with session ${sessionId} failed, ${errorMessage}`);
         return;
       }
 

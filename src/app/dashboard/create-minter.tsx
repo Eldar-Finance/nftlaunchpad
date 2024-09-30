@@ -69,7 +69,7 @@ export function CreateMinter({ onBack }: CreateMinterProps) {
           successMessage: 'collection created successfully',
         }
       })
-      // console.log(`Action completed, session ID:`, sessionId)
+       console.log(`Action completed, session ID:`, sessionId)
     } catch (error) {
         console.error('Collection creation failed:', error);
     }

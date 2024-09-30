@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useGetNetworkConfig } from '@/hooks';
-import { Address, ResultsParser, AbiRegistry, ContractFunction } from '@multiversx/sdk-core';
+import { Address, AbiRegistry, ContractFunction } from '@multiversx/sdk-core';
 import { ProxyNetworkProvider } from '@multiversx/sdk-network-providers';
 import { SmartContract } from '@multiversx/sdk-core/out';
 import proxyAbyJson from '@/contracts/nft_minter_proxy.abi.json';

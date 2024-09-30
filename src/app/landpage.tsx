@@ -95,19 +95,11 @@ export default function LandingPage() {
 
       {/* Stats Section with 3D Holographic Display */}
       <section className="relative py-20">
-        <div className="container mx-auto px-4">
-          <h2 className="text-3xl md:text-4xl font-bold text-center mb-16 text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-500">Platform Stats</h2>
-          <div className="h-[400px] w-full">
-            <Canvas>
-              <ambientLight intensity={0.2} />
-              <pointLight position={[10, 10, 10]} intensity={0.8} />
-              <HolographicStats />
-              <Environment preset="night" />
-              <OrbitControls enableZoom={false} enablePan={false} enableRotate={true} />
-            </Canvas>
-          </div>
-        </div>
-      </section>
+      <div className="container mx-auto px-4">
+        <h2 className="text-3xl md:text-4xl font-bold text-center mb-16 text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-500">Platform Stats</h2>
+        <ExtraordinaryStats />
+      </div>
+    </section>
 
       {/* CTA Section with Minimalist Design */}
       <section className="relative py-20">
@@ -211,7 +203,7 @@ function FeatureCard({ feature, index }: { feature: any, index: any }) {
   )
 }
 
-function HolographicStats() {
+function ExtraordinaryStats() {
   const stats = [
     { label: 'NFTs', value: 10000, color: '#00FFFF' },
     { label: 'Artists', value: 1000, color: '#FF00FF' },
@@ -219,46 +211,54 @@ function HolographicStats() {
   ]
 
   return (
-    <group scale={[1.5, 1.5, 1.5]} position={[0, -1, -2]}>
+    <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
       {stats.map((stat, index) => (
-        <group key={index} position={[index * 1.5 - 1.5, 0, 0]}>
-          <mesh>
-            <cylinderGeometry args={[0.4, 0.4, stat.value / 200000, 32]} />
-            <MeshTransmissionMaterial
-              backside
-              samples={16}
-              thickness={0.5}
-              chromaticAberration={1}
-              anisotropy={0.3}
-              distortion={0.5}
-              distortionScale={0.5}
-              temporalDistortion={0.1}
-              color={stat.color}
-              attenuationDistance={0.5}
-              attenuationColor="#ffffff"
-            />
-          </mesh>
-          <Text
-            position={[0, stat.value / 400000 + 0.3, 0]}
-            fontSize={0.15}
-            color="white"
-            anchorX="center"
-            anchorY="bottom"
-          >
-            {stat.label}
-          </Text>
-          <Text
-            position={[0, stat.value / 400000 + 0.5, 0]}
-            fontSize={0.12}
-            color="white"
-            anchorX="center"
-            anchorY="bottom"
+        <motion.div
+          key={index}
+          className="relative overflow-hidden rounded-lg bg-gray-900 p-6"
+          initial={{ opacity: 0, y: 50 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: index * 0.2 }}
+        >
+          <motion.div
+            className="absolute inset-0 opacity-20"
+            style={{ background: `radial-gradient(circle at center, ${stat.color}, transparent 70%)` }}
+            animate={{
+              scale: [1, 1.2, 1],
+              opacity: [0.2, 0.3, 0.2],
+            }}
+            transition={{
+              duration: 3,
+              repeat: Infinity,
+              repeatType: "reverse",
+            }}
+          />
+          <h3 className="text-2xl font-bold mb-2" style={{ color: stat.color }}>{stat.label}</h3>
+          <motion.div
+            className="text-5xl font-extrabold"
+            initial={{ opacity: 0, scale: 0.5 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.5, delay: index * 0.2 + 0.3 }}
           >
             {stat.value.toLocaleString()}
-          </Text>
-        </group>
+          </motion.div>
+          <motion.div
+            className="mt-4 h-1 w-full bg-gray-700 rounded-full overflow-hidden"
+            initial={{ width: 0 }}
+            animate={{ width: "100%" }}
+            transition={{ duration: 1, delay: index * 0.2 + 0.6 }}
+          >
+            <motion.div
+              className="h-full rounded-full"
+              style={{ background: stat.color }}
+              initial={{ width: 0 }}
+              animate={{ width: "100%" }}
+              transition={{ duration: 1.5, delay: index * 0.2 + 0.6 }}
+            />
+          </motion.div>
+        </motion.div>
       ))}
-    </group>
+    </div>
   )
 }
 
