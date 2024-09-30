@@ -416,7 +416,7 @@ export function CreateCollection({ onBack }: CreateCollectionProps) {
                     </Tooltip>
                   </TooltipProvider>
                 </Label>
-                <div className="flex items-center space-x-4 mt-2">
+                <div className="flex items-center space-x-4 mt-2 bg-blue-500">
                   <Slider
                     id="royalties"
                     min={0}
