@@ -63,8 +63,9 @@ export default function SingleCollectionMint({ collectionId, onBackClick }: Sing
   const { network } = useGetNetworkConfig()
   const { address: connectedAddress } = useGetAccountInfo()
   
-  const { collectionsInfo, loading } = useGetCollectionsInfo([collectionId]);
+  const { collectionsInfo, loading } = useGetCollectionsInfo([collectionId], connectedAddress);
   const collectionData: CollectionInfo | undefined = collectionsInfo[0];
+
 
   useEffect(() => {
     setRandomImageNumber(Math.floor(Math.random() * (7 - 3 + 1) + 3))
@@ -109,8 +110,9 @@ export default function SingleCollectionMint({ collectionId, onBackClick }: Sing
     // console.log('totalCost', selectedCost.amount);
     const totalCost = selectedCost.amount * mintAmount;
     const totalCostWithFee = totalCost + (totalCost * collectionData.fee / 100);
-    const newtotal = (totalCostWithFee / 1e18 );
-    // console.log('totalCost', newtotal);
+
+    const newtotal = (totalCostWithFee / 1e18 );  
+  
 
     // Prepare hex arguments
     const mintAmountHex = ensureEvenHex(mintAmount.toString(16));
@@ -177,8 +179,8 @@ export default function SingleCollectionMint({ collectionId, onBackClick }: Sing
   const getMaxMintAmount = () => {
     if (!collectionData) return 1;
 
-    const remainingMints = isNaN(collectionData.minted) 
-      ? collectionData.maxMints 
+    const remainingMints = collectionData.maxMints === 0 || isNaN(collectionData.minted)
+      ? Infinity
       : collectionData.maxMints - collectionData.minted;
 
     const userRemainingMints = isNaN(collectionData.userMaxMints)
@@ -194,7 +196,8 @@ export default function SingleCollectionMint({ collectionId, onBackClick }: Sing
       !collectionData.isMintingEnabled ||
       !selectedToken ||
       collectionData.minted >= collectionData.maxMints ||
-      (collectionData.isPhaseWlOnly && !collectionData.canUserTryToMint)
+      (collectionData.isPhaseWlOnly && !collectionData.canUserTryToMint) ||
+      false // Add a default condition or remove the last '||'
     );
   }
 
@@ -398,7 +401,7 @@ export default function SingleCollectionMint({ collectionId, onBackClick }: Sing
 
               <p className="text-md text-gray-300">
                 {isNaN(collectionData.userMaxMints) && isNaN(collectionData.userMinted) ? "You can mint as many as you want" : 
-                isNaN(collectionData.userMinted) ? `You can mint ${collectionData.userMaxMints}` : 
+                isNaN(collectionData.userMinted) ? `You can mint ${collectionData.userMaxMints - collectionData.userMinted}` : 
                 `You have ${collectionData.userMaxMints - collectionData.userMinted} NFTs left to mint.`}
               </p>
 

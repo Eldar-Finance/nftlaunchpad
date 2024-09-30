@@ -8,6 +8,7 @@ import {
     ProxyNetworkProvider,
     notproxy, // Ensure the class name is capitalized
   } from '@/utils';
+import { OptionalValue, AddressValue } from '@multiversx/sdk-core/out';
 
 interface CollectionInfo {
   address: string;
@@ -39,7 +40,7 @@ interface CollectionInfo {
   canUserTryToMint: boolean;
 }
 
-export const useGetCollectionsInfo = (collectionAddresses: string[]) => {
+export const useGetCollectionsInfo = (collectionAddresses: string[], userAddress?: string) => {
   const [collectionsInfo, setCollectionsInfo] = useState<CollectionInfo[]>([]);
   const [loading, setLoading] = useState(true);
   const { network } = useGetNetworkConfig();
@@ -55,11 +56,10 @@ export const useGetCollectionsInfo = (collectionAddresses: string[]) => {
         try {
           const query = contract.createQuery({
             func: new ContractFunction('getMinterInfo'),
-            args: []
+            args: userAddress ? [new AddressValue(new Address(userAddress))] : []
           });
           const response = await proxy.queryContract(query);
 
-          
           // Decode the returnData
           const decodedData = response.returnData.map((data: string) => Buffer.from(data, 'base64').toString('hex'));
 
