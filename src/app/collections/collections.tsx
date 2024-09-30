@@ -6,7 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Progress } from "@/components/ui/progress"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
-import { Users, DollarSign } from 'lucide-react'
+import { Frame, Coins } from 'lucide-react'
 import { useGetLiveMinters } from '@/hooks/getLiveMinters';
 import Image from 'next/image';
 
@@ -89,7 +89,7 @@ export default function Collections({ onCollectionSelect }: CollectionsProps) {
                 <div className="space-y-4">
                   <div className="flex justify-between items-center">
                     <div className="flex items-center">
-                      <Users className="w-5 h-5 mr-2 text-blue-400" />
+                      <Frame className="w-5 h-5 mr-2 text-blue-400" />
                       <span className="text-white">{collection.minted} / {collection.maxSupply}</span>
                     </div>
                     <TooltipProvider>
@@ -105,7 +105,7 @@ export default function Collections({ onCollectionSelect }: CollectionsProps) {
                   </div>
                   <div className="flex justify-between items-center">
                     <div className="flex items-center">
-                      <DollarSign className="w-5 h-5 mr-2 text-green-400" />
+                      <Coins className="w-5 h-5 mr-2 text-green-400" />
                       <span className="text-white flex items-center">
                         {collection.cost/1e18 || 'N/A'} {' '}
                         {formatTokenIdentifier(collection.tokenIdentifier)}
