@@ -17,6 +17,7 @@ import {
 } from '@/hooks/sdkDappHooks';
 import { newTransaction } from '@/helpers/sdkDappHelpers';
 import Image from 'next/image';
+import { Slider } from "@/components/ui/slider"
 
 import { Address } from '@multiversx/sdk-core';
 import { GAS_PRICE, VERSION } from '@/localConstants';
@@ -109,6 +110,11 @@ export function CreateCollection({ onBack }: CreateCollectionProps) {
       }
     }
   }
+
+  const handleRoyaltiesChange = (value: number[]) => {
+    setFormData(prev => ({ ...prev, royalties: value[0].toString() }));
+    setRoyaltiesError('');
+  };
 
   const fetchIpfsData = async (cid: string) => {
     setIsLoading(true);
@@ -405,22 +411,23 @@ export function CreateCollection({ onBack }: CreateCollectionProps) {
                         <Info className="w-4 h-4 ml-2 cursor-help text-gray-500" />
                       </TooltipTrigger>
                       <TooltipContent side="right" className="bg-gray-800 text-white p-2 rounded-md text-xs">
-                        <p>A number between 0 and 100 with up to 2 decimal places.</p>
+                        <p>Set the royalties percentage for secondary sales.</p>
                       </TooltipContent>
                     </Tooltip>
                   </TooltipProvider>
                 </Label>
-                <Input
-                  id="royalties"
-                  name="royalties"
-                  type="text"
-                  value={formData.royalties}
-                  onChange={handleInputChange}
-                  required
-                  className="mt-1 bg-gray-800 border-gray-700 text-white placeholder-gray-500 focus:ring-yellow-500 focus:border-yellow-500"
-                  placeholder="e.g., 2.5"
-                />
-                {royaltiesError && <p className="text-red-500 text-xs mt-1">{royaltiesError}</p>}
+                <div className="flex items-center space-x-4 mt-2">
+                  <Slider
+                    id="royalties"
+                    min={0}
+                    max={100}
+                    step={1}
+                    value={[parseFloat(formData.royalties) || 0]}
+                    onValueChange={handleRoyaltiesChange}
+                    className="flex-grow"
+                  />
+                  <span className="text-white font-medium">{formData.royalties}%</span>
+                </div>
               </div>
               <div>
                 <Label htmlFor="maxSupply" className="flex items-center text-sm font-medium text-gray-300">
