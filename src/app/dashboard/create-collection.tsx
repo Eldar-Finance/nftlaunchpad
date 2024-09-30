@@ -425,7 +425,7 @@ export function CreateCollection({ onBack }: CreateCollectionProps) {
                     step={1}
                     value={[parseFloat(formData.royalties) || 0]}
                     onValueChange={handleRoyaltiesChange}
-                    className="flex-grow custom-slider"
+                    className="flex-grow custom-slider bg-blue-500" 
                   />
                   <span className="text-white font-medium w-12 text-right">{formData.royalties}%</span>
                 </div>
