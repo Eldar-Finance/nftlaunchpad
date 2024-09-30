@@ -6,7 +6,7 @@ import { useBatchTransactionsTracker } from '@/hooks/sdkDappHooks';
 export const TransactionsTracker = () => {
   useTransactionsTracker({
     onSuccess: (sessionId: string) => {
-       // console.log(`Session ${sessionId} successfully completed`);
+       console.log(`Session ${sessionId} successfully completed`);
     },
     onFail: (sessionId: string, errorMessage?: string) => {
       if (errorMessage) {
