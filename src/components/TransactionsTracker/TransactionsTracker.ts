@@ -14,7 +14,7 @@ export const TransactionsTracker = () => {
         return;
       }
 
-      // console.log(`Session ${sessionId} failed`);
+       console.log(`Session ${sessionId} failed`);
     }
   });
   // We do this in order to have full control of the implementation
@@ -26,11 +26,11 @@ export const TransactionsTracker = () => {
     },
     onFail: (sessionId, errorMessage) => {
       if (errorMessage) {
-         //console.log(`Batch with session ${sessionId} failed, ${errorMessage}`);
+         console.log(`Batch with session ${sessionId} failed, ${errorMessage}`);
         return;
       }
 
-       // console.log(`Batch with session ${sessionId} failed`);
+        console.log(`Batch with session ${sessionId} failed`);
     }
   });
 

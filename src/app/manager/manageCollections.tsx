@@ -133,7 +133,7 @@ export default function CollectionManager({ collectionAddress }: { collectionAdd
           successMessage: 'Phase created successfully',
         }
       })
-      // console.log(`Phase created, session ID:`, sessionId)
+      console.log(`Phase created, session ID:`, sessionId)
     } catch (error) {
       console.error('Failed to create phase:', error)
     }
@@ -185,7 +185,7 @@ export default function CollectionManager({ collectionAddress }: { collectionAdd
         }
       })
 
-      // console.log(`Action completed, session ID:`, sessionId)
+      console.log(`Action completed, session ID:`, sessionId)
     } catch (error) {
       console.error('Action failed:', error)
     }

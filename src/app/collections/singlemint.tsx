@@ -149,7 +149,7 @@ export default function SingleCollectionMint({ collectionId, onBackClick }: Sing
         }
       });
 
-      // console.log('Minting initiated, session ID:', sessionId);
+       console.log('Minting initiated, session ID:', sessionId);
     } catch (error) {
       console.error('Minting failed:', error);
     }
