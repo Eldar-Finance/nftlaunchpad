@@ -64,10 +64,10 @@ export default function LandingPage() {
         {/* Content Overlay */}
         <div className="absolute inset-0 flex items-center justify-center" style={{ pointerEvents: 'none' }}>
           <div className="container mx-auto px-4 text-center" style={{ pointerEvents: 'auto' }}>
-            <h1 className="text-7xl md:text-9xl font-extrabold mb-6 bg-gradient-to-r from-cyan-400 via-blue-500 to-purple-600 bg-clip-text text-transparent">
+            <h1 className="text-2xl md:text-7xl font-extrabold mb-6 bg-gradient-to-r from-cyan-400 via-blue-500 to-purple-600 bg-clip-text text-transparent">
               QuantumX Launcher
             </h1>
-            <p className="text-2xl md:text-4xl text-gray-400 mb-8" style={{ textShadow: '0 0 5px rgba(0,0,0,0.5)' }}>
+            <p className="text-xl md:text-2xl text-gray-400 mb-8" style={{ textShadow: '0 0 5px rgba(0,0,0,0.5)' }}>
               Next-Gen NFT Collection Launcher
             </p>
             <Button
