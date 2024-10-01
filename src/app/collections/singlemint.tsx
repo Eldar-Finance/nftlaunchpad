@@ -107,12 +107,9 @@ export default function SingleCollectionMint({ collectionId, onBackClick }: Sing
       console.error('Selected token cost not found');
       return;
     }
-    // console.log('totalCost', selectedCost.amount);
+    
     const totalCost = selectedCost.amount * mintAmount;
-    const totalCostWithFee = totalCost + (totalCost * collectionData.fee / 100);
-
-    const newtotal = (totalCostWithFee / 1e18 );  
-  
+    const newtotal = (totalCost / 1e18 );  
 
     // Prepare hex arguments
     const mintAmountHex = ensureEvenHex(mintAmount.toString(16));
@@ -192,14 +189,20 @@ export default function SingleCollectionMint({ collectionId, onBackClick }: Sing
 
   const isMintingDisabled = () => {
     if (!collectionData) return true;
+    
+    const userMinted = isNaN(collectionData.userMinted) ? 0 : collectionData.userMinted;
+    
     return (
       !collectionData.isMintingEnabled ||
       !selectedToken ||
       collectionData.minted >= collectionData.maxMints ||
       (collectionData.isPhaseWlOnly && !collectionData.canUserTryToMint) ||
-      false // Add a default condition or remove the last '||'
+      (
+        !isNaN(collectionData.userMaxMints) && 
+        userMinted >= collectionData.userMaxMints
+      )
     );
-  }
+  };
 
   if (loading) {
     return <div className="flex justify-center items-center h-screen">

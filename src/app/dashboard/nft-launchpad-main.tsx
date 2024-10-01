@@ -1,96 +1,130 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
+"use client"
 
-
-'use client'
-
-import { useState } from 'react'
+import { useState, useRef, useEffect } from 'react'
+import { motion, AnimatePresence, useScroll, useTransform } from 'framer-motion'
 import { CreateCollection } from "./create-collection"
 import { CreateMinter } from "./create-minter"
-import { PlusCircle, Rocket, ArrowRight } from "lucide-react"
+import { PlusCircle, Rocket, ArrowRight, ChevronLeft } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card, CardContent } from "@/components/ui/card"
+import Image from 'next/image'
 
 export default function NFTLaunchpadMain() {
   const [selectedOption, setSelectedOption] = useState<'create' | 'minter' | null>(null)
+  const containerRef = useRef<HTMLDivElement>(null)
+  const { scrollYProgress } = useScroll({ target: containerRef })
+  const yRange = useTransform(scrollYProgress, [0, 1], [0, 100])
+
+  const [backgroundImage, setBackgroundImage] = useState<string>('')
+
+  useEffect(() => {
+    // Simulating a random background image
+    setBackgroundImage(`https://source.unsplash.com/random/1920x1080?nft,digital,art`)
+  }, [])
+
+  const options = [
+    { 
+      title: 'Create Collection', 
+      description: 'Start your NFT journey by creating a unique collection. Define Collection Name and Ticker before creating the minter smart contract.',
+      icon: <PlusCircle size={32} className="text-blue-400" />,
+      action: () => setSelectedOption('create'),
+      color: 'from-blue-600 to-blue-400'
+    },
+    { 
+      title: 'Create Minter', 
+      description: 'Ready to launch? Create a minter smart contract for your existing collection and set your NFTs free in the market.',
+      icon: <Rocket size={32} className="text-green-400" />,
+      action: () => setSelectedOption('minter'),
+      color: 'from-green-600 to-green-400'
+    },
+    { 
+      title: 'Manager Dashboard', 
+      description: 'Manage your issued collections, track performance, and make adjustments to your NFTs seamlessly.',
+      icon: <Rocket size={32} className="text-yellow-400" />,
+      action: () => window.location.href = '/manager',
+      color: 'from-yellow-600 to-yellow-400'
+    }
+  ]
 
   return (
-    <div className="min-h-screen bg-transparent text-white p-8">
-      <div className="container mx-auto py-12 max-w-6xl">
-        <div className="space-y-12">
-          <h1 className="text-4xl md:text-5xl font-bold text-center text-white mb-8">
-            Your NFT Launchpad in 3..2..1
-          </h1>
-          
-          {!selectedOption && (
-            <div className="grid md:grid-cols-2 gap-8">
-              <Card className="bg-gradient-to-br from-gray-900 to-gray-800 rounded-lg shadow-xl hover:shadow-2xl transition-all duration-300 border border-gray-700">
-                <CardContent className="p-6">
-                  <CardHeader className="p-0 mb-4">
-                    <CardTitle className="text-2xl font-semibold flex items-center text-white">
-                      <PlusCircle size={24} className="text-blue-400 mr-3" />
-                      Create Collection
-                    </CardTitle>
-                  </CardHeader>
-                  <p className="text-gray-400 mb-6 text-sm">
-                    Start your NFT journey by creating a unique collection. Define Collection Name and Ticker before creating the minter smart contract.
-                  </p>
-                  <Button
-                    className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium transition-colors duration-200"
-                    onClick={() => setSelectedOption('create')}
+    <div className="relative min-h-screen w-screen text-white overflow-hidden" ref={containerRef}>
+      <motion.div 
+        className="absolute inset-0 z-0"
+        style={{
+          backgroundImage: `url(${backgroundImage})`,
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+          filter: 'blur(10px) brightness(0.3)',
+        }}
+      />
+      <div className="relative z-10 container mx-auto py-12 px-4 max-w-6xl">
+        <motion.h1 
+          className="text-5xl md:text-7xl font-bold mb-12 text-center text-white mix-blend-difference"
+          initial={{ opacity: 0, y: -50 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+        >
+          Your NFT Launchpad in 3..2..1
+        </motion.h1>
+        
+        <AnimatePresence mode="wait">
+          {!selectedOption ? (
+            <motion.div 
+              className="grid md:grid-cols-2 lg:grid-cols-3 gap-8"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.5 }}
+              style={{ y: yRange }}
+            >
+              {options.map((option, index) => (
+                <motion.div
+                  key={option.title}
+                  initial={{ opacity: 0, y: 50 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.5, delay: index * 0.1 }}
+                >
+                  <Card 
+                    className="bg-black/30 backdrop-blur-xl border-none overflow-hidden transition-all duration-300 ease-in-out transform hover:scale-105 hover:shadow-2xl hover:shadow-purple-500/20 h-full flex flex-col"
                   >
-                    Create Collection
-                    <ArrowRight className="ml-2 h-4 w-4" />
-                  </Button>
-                </CardContent>
-              </Card>
-              
-              <Card className="bg-gradient-to-br from-gray-900 to-gray-800 rounded-lg shadow-xl hover:shadow-2xl transition-all duration-300 border border-gray-700">
-                <CardContent className="p-6">
-                  <CardHeader className="p-0 mb-4">
-                    <CardTitle className="text-2xl font-semibold flex items-center text-white">
-                      <Rocket size={24} className="text-green-400 mr-3" />
-                      Create Minter
-                    </CardTitle>
-                  </CardHeader>
-                  <p className="text-gray-400 mb-6 text-sm">
-                    Ready to launch? Create a minter smart contract for your existing collection and set your NFTs free in the market.
-                  </p>
-                  <Button
-                    className="w-full bg-green-600 hover:bg-green-700 text-white font-medium transition-colors duration-200"
-                    onClick={() => setSelectedOption('minter')}
-                  >
-                    Create Minter
-                    <ArrowRight className="ml-2 h-4 w-4" />
-                  </Button>
-                </CardContent>
-              </Card>
-
-              <Card className="bg-gradient-to-br from-gray-900 to-gray-800 rounded-lg shadow-xl hover:shadow-2xl transition-all duration-300 border border-gray-700">
-                <CardContent className="p-6">
-                  <CardHeader className="p-0 mb-4">
-                    <CardTitle className="text-2xl font-semibold flex items-center text-white">
-                      <Rocket size={24} className="text-yellow-400 mr-3" />
-                      Manager Dashboard
-                    </CardTitle>
-                  </CardHeader>
-                  <p className="text-gray-400 mb-6 text-sm">
-                    Manage your issued collections, track performance, and make adjustments to your NFTs seamlessly.
-                  </p>
-                  <Button
-                    className="w-full bg-yellow-600 hover:bg-yellow-700 text-white font-medium transition-colors duration-200"
-                    onClick={() => window.location.href = '/manager'} // Redirect to /manager
-                  >
-                    Go to Dashboard
-                    <ArrowRight className="ml-2 h-4 w-4" />
-                  </Button>
-                </CardContent>
-              </Card>
-            </div>
+                    <CardContent className="p-6 flex flex-col h-full">
+                      <div className="flex items-center mb-4">
+                        {option.icon}
+                        <h2 className="text-2xl font-bold ml-3 text-white">{option.title}</h2>
+                      </div>
+                      <p className="text-gray-300 mb-6 flex-grow">{option.description}</p>
+                      <Button
+                        className={`w-full text-white font-medium transition-all duration-300 bg-gradient-to-r ${option.color} hover:shadow-lg hover:shadow-purple-500/50`}
+                        onClick={option.action}
+                      >
+                        {option.title}
+                        <ArrowRight className="ml-2 h-4 w-4" />
+                      </Button>
+                    </CardContent>
+                  </Card>
+                </motion.div>
+              ))}
+            </motion.div>
+          ) : (
+            <motion.div
+              initial={{ opacity: 0, y: 50 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -50 }}
+              transition={{ duration: 0.5 }}
+            >
+              <Button
+                variant="ghost"
+                className="mb-6 text-white hover:text-gray-300 transition-colors"
+                onClick={() => setSelectedOption(null)}
+              >
+                <ChevronLeft className="mr-2 h-4 w-4" />
+                Back to Options
+              </Button>
+              {selectedOption === 'create' && <CreateCollection onBack={() => setSelectedOption(null)} />}
+              {selectedOption === 'minter' && <CreateMinter onBack={() => setSelectedOption(null)} />}
+            </motion.div>
           )}
-
-          {selectedOption === 'create' && <CreateCollection onBack={() => setSelectedOption(null)} />}
-          {selectedOption === 'minter' && <CreateMinter onBack={() => setSelectedOption(null)} />}
-        </div>
+        </AnimatePresence>
       </div>
     </div>
   )

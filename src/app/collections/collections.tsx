@@ -1,133 +1,150 @@
-'use client'
+"use client"
 
-import { useState, useMemo } from 'react'
-import { motion } from 'framer-motion'
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { useRef, useEffect, useState } from 'react'
+import { motion, useScroll, useTransform } from 'framer-motion'
+import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Progress } from "@/components/ui/progress"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
-import { Frame, Coins } from 'lucide-react'
-import { useGetLiveMinters } from '@/hooks/getLiveMinters';
-import Image from 'next/image';
+import { Frame, Coins, ChevronRight } from 'lucide-react'
+import { useGetLiveMinters } from '@/hooks/getLiveMinters'
+import Image from 'next/image'
 
 interface CollectionsProps {
-  onCollectionSelect: (collectionId: string) => void;
+  onCollectionSelect: (collectionId: string) => void
 }
 
 export default function Collections({ onCollectionSelect }: CollectionsProps) {
-  const [hoveredCard, setHoveredCard] = useState<string | null>(null)
-  const { liveMinters, isLoading } = useGetLiveMinters();
+  const { liveMinters, isLoading } = useGetLiveMinters()
+  const containerRef = useRef<HTMLDivElement>(null)
+  const { scrollYProgress } = useScroll({ target: containerRef })
+  const yRange = useTransform(scrollYProgress, [0, 1], [0, 50])
 
-  // Generate random numbers for each collection
-  const randomNumbers = useMemo(() => 
-    liveMinters.map(() => Math.floor(Math.random() * (8 - 3 + 1) + 3)),
-    [liveMinters]
-  );
+  const [backgroundImages, setBackgroundImages] = useState<string[]>([])
+
+  useEffect(() => {
+    if (liveMinters.length > 0) {
+      const images = liveMinters.map((collection) => 
+        `https://ipfs.io/ipfs/${collection.ipfsCid}/${Math.floor(Math.random() * (8 - 3 + 1) + 3)}.png`
+      )
+      setBackgroundImages(images)
+    }
+  }, [liveMinters])
 
   if (isLoading) {
-    return <div className="h-screen w-screen flex items-center justify-center">Loading...</div>;
+    return (
+      <div className="h-screen w-screen flex items-center justify-center bg-black">
+        <motion.div
+          initial={{ opacity: 0, scale: 0.5 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.5, repeat: Infinity, repeatType: "reverse" }}
+          className="text-4xl font-bold text-white"
+        >
+          Loading...
+        </motion.div>
+      </div>
+    )
   }
 
   const formatTokenIdentifier = (identifier: string) => {
-    return identifier.split('-')[0];
-  };
+    return identifier.split('-')[0]
+  }
 
   return (
-    <div className="min-h-screen w-screen bg-gradient-to-b from-gray-950 to-gray-900 text-gray-200 p-8 overflow-x-hidden">
+    <div className="relative min-h-screen w-screen  text-white overflow-hidden" ref={containerRef}>
+      <motion.div 
+        className="absolute inset-0 z-0"
+        style={{
+          backgroundImage: `url(${backgroundImages[0]})`,
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+          filter: 'blur(10px) brightness(0.3)',
+        }}
+      />
       <motion.h1 
-        className="text-5xl font-bold mb-12 text-center text-white"
+        className="text-4xl font-bold mb-6 pt-8 text-center text-white mix-blend-difference sticky top-0 z-50"
         initial={{ opacity: 0, y: -50 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
       >
         Active Collections
       </motion.h1>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+      <motion.div 
+        className="relative z-10 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 py-8 px-4"
+        style={{ y: yRange }}
+      >
         {liveMinters.map((collection, index) => (
           <motion.div
             key={collection.address}
+            className="w-full"
             initial={{ opacity: 0, y: 50 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: index * 0.1 }}
+            transition={{ duration: 0.5, delay: index * 0.05 }}
           >
             <Card 
-              className="bg-gray-800 border-gray-700 overflow-hidden transition-all duration-300 ease-in-out transform hover:scale-105 hover:shadow-2xl h-full"
-              onMouseEnter={() => setHoveredCard(collection.address)}
-              onMouseLeave={() => setHoveredCard(null)}
+              className="bg-black/30 backdrop-blur-xl border-none overflow-hidden transition-all duration-300 ease-in-out transform hover:scale-105 hover:shadow-lg hover:shadow-purple-500/20 h-full flex flex-col"
             >
-              <div className="relative">
-                <img 
-                  src={`https://ipfs.io/ipfs/${collection.ipfsCid}/${randomNumbers[index]}.png`} 
-                  alt={collection.collectionName} 
-                  className="w-full h-64 object-cover"
+              <div className="relative aspect-square">
+                <Image 
+                  src={backgroundImages[index]}
+                  alt={collection.collectionName}
+                  layout="fill"
+                  objectFit="cover"
+                  className="transition-all duration-500 ease-in-out transform hover:scale-110"
                 />
-                <div className="absolute top-0 left-0 bg-gradient-to-r from-blue-600 to-purple-600 text-white px-3 py-1 rounded-br-lg">
-                  Minting now
+                <div className="absolute inset-0 bg-gradient-to-t from-black to-transparent" />
+                <div className="absolute bottom-0 left-0 p-2">
+                  <h2 className="text-sm font-bold mb-1 line-clamp-1">{collection.collectionName}</h2>
+                  <p className="text-xs text-gray-300 line-clamp-2">{collection.collectionDescription}</p>
                 </div>
-                {hoveredCard === collection.address && (
-                  <motion.div 
-                    className="absolute inset-0 bg-black bg-opacity-70 flex items-center justify-center"
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    transition={{ duration: 0.2 }}
-                  >
-                    <Button 
-                      variant="outline" 
-                      className="text-white border-white hover:bg-white hover:text-black transition-colors"
-                      onClick={() => onCollectionSelect(collection.address)}
-                    >
-                      View Collection
-                    </Button>
-                  </motion.div>
-                )}
               </div>
-              <CardHeader>
-                <CardTitle className="text-2xl font-bold text-white">{collection.collectionName}</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-gray-300 mb-4">{collection.collectionDescription}</p>
-                <div className="space-y-4">
+              <CardContent className="p-2 space-y-2 flex-grow flex flex-col justify-between">
+                <div className="space-y-2">
                   <div className="flex justify-between items-center">
-                    <div className="flex items-center">
-                      <Frame className="w-5 h-5 mr-2 text-blue-400" />
-                      <span className="text-white">{collection.minted} / {collection.maxSupply}</span>
+                    <div className="flex items-center space-x-1">
+                      <Frame className="w-3 h-3 text-purple-400" />
+                      <span className="text-xs font-semibold">{collection.minted}/{collection.maxSupply}</span>
                     </div>
                     <TooltipProvider>
                       <Tooltip>
                         <TooltipTrigger>
-                          <Progress value={(collection.minted / collection.maxSupply) * 100} className="w-24" />
+                          <Progress value={(collection.minted / collection.maxSupply) * 100} className="w-16 h-1" />
                         </TooltipTrigger>
                         <TooltipContent side="top">
-                          <p className="text-white">{((collection.minted / collection.maxSupply) * 100).toFixed(1)}% minted</p>
+                          <p className="text-xs font-semibold">{((collection.minted / collection.maxSupply) * 100).toFixed(1)}% minted</p>
                         </TooltipContent>
                       </Tooltip>
                     </TooltipProvider>
                   </div>
-                  <div className="flex justify-between items-center">
-                    <div className="flex items-center">
-                      <Coins className="w-5 h-5 mr-2 text-green-400" />
-                      <span className="text-white flex items-center">
-                        {collection.cost/1e18 || 'N/A'} {' '}
-                        {formatTokenIdentifier(collection.tokenIdentifier)}
-                        <Image 
-                          src={collection.tokenIdentifier === 'EGLD' 
-                            ? '/assets/img/multiversx-symbol.svg'
-                            : `https://tools.multiversx.com/assets-cdn/devnet/tokens/${collection.tokenIdentifier}/icon.png`}
-                          alt={collection.tokenIdentifier}
-                          width={20}
-                          height={20}
-                          className="mx-1"
-                        />
-                        
-                      </span>
-                    </div>
+                  <div className="flex items-center space-x-1">
+                    <Coins className="w-3 h-3 text-green-400" />
+                    <span className="text-xs font-semibold flex items-center space-x-1">
+                      <span>{collection.cost/1e18 || 'N/A'}</span>
+                      <span>{formatTokenIdentifier(collection.tokenIdentifier)}</span>
+                      <Image 
+                        src={collection.tokenIdentifier === 'EGLD' 
+                          ? '/assets/img/multiversx-symbol.svg'
+                          : `https://tools.multiversx.com/assets-cdn/devnet/tokens/${collection.tokenIdentifier}/icon.png`}
+                        alt={collection.tokenIdentifier}
+                        width={12}
+                        height={12}
+                      />
+                    </span>
                   </div>
                 </div>
+                <Button 
+                  variant="outline" 
+                  className="text-white border-white hover:bg-white hover:text-black transition-colors text-xs w-full mt-2 py-1 h-auto"
+                  onClick={() => onCollectionSelect(collection.address)}
+                >
+                  View
+                  <ChevronRight className="ml-1 h-3 w-3" />
+                </Button>
               </CardContent>
             </Card>
           </motion.div>
         ))}
-      </div>
+      </motion.div>
     </div>
   )
 }

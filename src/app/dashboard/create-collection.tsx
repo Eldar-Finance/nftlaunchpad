@@ -20,6 +20,7 @@ import Image from 'next/image';
 import { Slider } from "@/components/ui/slider"
 
 import { Address } from '@multiversx/sdk-core';
+import { useGetCollectionCreationFee } from '@/hooks/useGetMinterFee';
 import { GAS_PRICE, VERSION } from '@/localConstants';
 
 interface Attribute {
@@ -65,6 +66,8 @@ export function CreateCollection({ onBack }: CreateCollectionProps) {
     ipfsCid: '',
     tags: ''
   })
+
+  const collectionCreationFee = useGetCollectionCreationFee();
   
   const { network } = useGetNetworkConfig();
   const { address: connectedAddress } = useGetAccountInfo();
@@ -247,12 +250,12 @@ export function CreateCollection({ onBack }: CreateCollectionProps) {
     const fileEnding = ensureEvenHex(stringToHex(imageType.toLowerCase()));
     const hasJsonMetadata = ensureEvenHex('1');
     const tags = ensureEvenHex(stringToHex(formData.tags));
-
+    const theFee = collectionCreationFee;
     // Construct hexArguments without costs
     const hexArguments = `createCollectionMinter@${name}@${nftName}@${ticker}@${description}@${royalties}@${maxSupply}@${ipfsCid}@${fileEnding}@${hasJsonMetadata}@${tags}`;
 
     const createCollectionTransaction = newTransaction({
-        value: 0,
+        value: theFee,
         data: hexArguments,
         receiver: "erd1qqqqqqqqqqqqqpgq0vct9qkqcnr0vgj8hsvdmufzxy9nevppu7zs8qzs0r",
         gasLimit: 20000000,
