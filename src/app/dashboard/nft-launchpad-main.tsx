@@ -30,10 +30,10 @@ export default function NFTLaunchpadMain() {
       color: 'from-blue-600 to-blue-400'
     },
     { 
-      title: 'Create Minter', 
-      description: 'Ready to launch? Create a minter smart contract for your existing collection and set your NFTs free in the market.',
+      title: 'Issue Minter', 
+      description: 'Ready to launch? Issue your minter smart contract for your existing collection and set your NFTs free in the market.',
       icon: <Rocket size={32} className="text-green-400" />,
-      action: () => setSelectedOption('minter'),
+      action: () => window.location.href = '/issue',
       color: 'from-green-600 to-green-400'
     },
     { 

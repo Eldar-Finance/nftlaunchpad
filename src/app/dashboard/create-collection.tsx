@@ -22,7 +22,8 @@ import { Slider } from "@/components/ui/slider"
 import { Address } from '@multiversx/sdk-core';
 import { useGetCollectionCreationFee } from '@/hooks/useGetMinterFee';
 import { GAS_PRICE, VERSION } from '@/localConstants';
-import { useRouter } from 'next/navigation'; // Import useRouter from Next.js
+import { useTrackTransactionStatus } from '@multiversx/sdk-dapp/hooks';
+import { useRouter } from 'next/navigation';
 
 interface Attribute {
   trait_type: string;
@@ -57,7 +58,6 @@ interface CreateCollectionProps {
 }
 
 export function CreateCollection({ onBack }: CreateCollectionProps) {
-  const router = useRouter(); // Initialize the router
   const [formData, setFormData] = useState({
     collectionName: '',
     nftName: '',
@@ -87,7 +87,31 @@ export function CreateCollection({ onBack }: CreateCollectionProps) {
   const [royaltiesError, setRoyaltiesError] = useState('');
   const [metadataList, setMetadataList] = useState<Metadata[]>([]);
   const [isLoading, setIsLoading] = useState(false);
-  const [transactionStatus, setTransactionStatus] = useState<'idle' | 'processing' | 'success' | 'error'>('idle');
+  const [sessionId, setSessionId] = useState<string | null>(null);
+  const router = useRouter();
+
+  const onSuccess = () => {
+    console.log('Transaction successful');
+    // You can add more logic here, like showing a success message or redirecting
+    router.push('/dashboard'); // Redirect to dashboard or wherever appropriate
+  };
+
+  const onFail = () => {
+    console.log('Transaction failed');
+    // Handle failure, maybe show an error message to the user
+  };
+
+  const onCancelled = () => {
+    console.log('Transaction cancelled');
+    // Handle cancellation
+  };
+
+  const transactionStatus = useTrackTransactionStatus({
+    transactionId: sessionId,
+    onSuccess,
+    onFail,
+    onCancelled,
+  });
 
   const handleInputChange = async (e: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>) => {
     const { name, value } = e.target
@@ -271,8 +295,6 @@ export function CreateCollection({ onBack }: CreateCollectionProps) {
     });
 
     try {
-        setTransactionStatus('processing');
-        
         const sessionId = await signAndSendTransactions({
             transactions: [createCollectionTransaction],
             callbackRoute: '',
@@ -283,28 +305,23 @@ export function CreateCollection({ onBack }: CreateCollectionProps) {
             }
         });
 
-        // Simulate a delay to allow for blockchain confirmation
-        setTimeout(() => {
-            setTransactionStatus('success');
-        }, 5000); // Increased to 8 seconds for this example
-
-        console.log('Collection creation initiated, session ID:', sessionId);
+        console.log('Collection created, session ID:', sessionId);
+        setSessionId(sessionId); // Set the sessionId to trigger the tracking
     } catch (error) {
         console.error('Collection creation failed:', error);
-        setTransactionStatus('error');
     }
   };
 
+  // You can use transactionStatus in your UI
   useEffect(() => {
-    if (transactionStatus === 'success') {
-      // Show success message
-      // Redirect to dashboard after a short delay
-      setTimeout(() => {
-        router.push('/dashboard');
-      }, 2000); // 2-second delay before redirect
-    } else if (transactionStatus === 'error') {
+    if (transactionStatus.isSuccessful) {
+      console.log('Transaction completed successfully');
+      // You can update your UI or state here
+    } else if (transactionStatus.isFailed) {
+      console.error('Transaction failed:', transactionStatus.errorMessage);
+      // Handle the error in your UI
     }
-  }, [transactionStatus, router]);
+  }, [transactionStatus]);
 
   return (
     <Card className="w-full max-w-2xl mx-auto bg-gradient-to-b from-gray-900 to-black rounded-lg shadow-xl border border-gray-800">
@@ -602,6 +619,15 @@ export function CreateCollection({ onBack }: CreateCollectionProps) {
           Note: You have to pay 0.2 EGLD to create your collection.
         </p>
       </CardFooter>
+      {/* You can add transaction status information to your UI */}
+      {sessionId && (
+        <div className="mt-4 text-center">
+          {transactionStatus.isPending && <p className="text-yellow-500">Transaction is pending...</p>}
+          {transactionStatus.isSuccessful && <p className="text-green-500">Transaction was successful!</p>}
+          {transactionStatus.isFailed && <p className="text-red-500">Transaction failed: {transactionStatus.errorMessage}</p>}
+          {transactionStatus.isCancelled && <p className="text-orange-500">Transaction was cancelled.</p>}
+        </div>
+      )}
     </Card>
   )
 }
