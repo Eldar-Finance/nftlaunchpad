@@ -22,6 +22,7 @@ import { Slider } from "@/components/ui/slider"
 import { Address } from '@multiversx/sdk-core';
 import { useGetCollectionCreationFee } from '@/hooks/useGetMinterFee';
 import { GAS_PRICE, VERSION } from '@/localConstants';
+import { useRouter } from 'next/navigation'; // Import useRouter from Next.js
 
 interface Attribute {
   trait_type: string;
@@ -56,6 +57,7 @@ interface CreateCollectionProps {
 }
 
 export function CreateCollection({ onBack }: CreateCollectionProps) {
+  const router = useRouter(); // Initialize the router
   const [formData, setFormData] = useState({
     collectionName: '',
     nftName: '',
@@ -85,6 +87,7 @@ export function CreateCollection({ onBack }: CreateCollectionProps) {
   const [royaltiesError, setRoyaltiesError] = useState('');
   const [metadataList, setMetadataList] = useState<Metadata[]>([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [transactionStatus, setTransactionStatus] = useState<'idle' | 'processing' | 'success' | 'error'>('idle');
 
   const handleInputChange = async (e: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>) => {
     const { name, value } = e.target
@@ -268,6 +271,8 @@ export function CreateCollection({ onBack }: CreateCollectionProps) {
     });
 
     try {
+        setTransactionStatus('processing');
+        
         const sessionId = await signAndSendTransactions({
             transactions: [createCollectionTransaction],
             callbackRoute: '',
@@ -278,11 +283,28 @@ export function CreateCollection({ onBack }: CreateCollectionProps) {
             }
         });
 
-        // console.log('Collection created, session ID:', sessionId);
+        // Simulate a delay to allow for blockchain confirmation
+        setTimeout(() => {
+            setTransactionStatus('success');
+        }, 5000); // Increased to 8 seconds for this example
+
+        console.log('Collection creation initiated, session ID:', sessionId);
     } catch (error) {
         console.error('Collection creation failed:', error);
+        setTransactionStatus('error');
     }
   };
+
+  useEffect(() => {
+    if (transactionStatus === 'success') {
+      // Show success message
+      // Redirect to dashboard after a short delay
+      setTimeout(() => {
+        router.push('/dashboard');
+      }, 2000); // 2-second delay before redirect
+    } else if (transactionStatus === 'error') {
+    }
+  }, [transactionStatus, router]);
 
   return (
     <Card className="w-full max-w-2xl mx-auto bg-gradient-to-b from-gray-900 to-black rounded-lg shadow-xl border border-gray-800">
