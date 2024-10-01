@@ -577,7 +577,7 @@ export function CreateCollection({ onBack }: CreateCollectionProps) {
       </CardContent>
       <CardFooter>
         <p className="text-xs text-center w-full text-gray-500 mt-4">
-          Note: You pay nothing to create your collection. A fee will apply to enable the minter.
+          Note: You have to pay 0.2 EGLD to create your collection.
         </p>
       </CardFooter>
     </Card>

@@ -8,7 +8,7 @@ import {
     ProxyNetworkProvider,
     notproxy, // Ensure the class name is capitalized
   } from '@/utils';
-import { OptionalValue, AddressValue } from '@multiversx/sdk-core/out';
+import {  AddressValue } from '@multiversx/sdk-core/out';
 
 interface CollectionInfo {
   address: string;
