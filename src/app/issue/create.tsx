@@ -21,7 +21,7 @@ interface CreateMinterProps {
   onBack: () => void;
 }
 
-export function CreateMinter({ onBack }: CreateMinterProps) {
+export function CreateMinter({ }: CreateMinterProps) {
   const { network } = useGetNetworkConfig();
   const { address: connectedAddress } = useGetAccountInfo();
   const { account } = useGetAccountInfo();
