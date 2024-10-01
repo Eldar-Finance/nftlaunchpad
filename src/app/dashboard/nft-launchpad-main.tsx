@@ -7,7 +7,6 @@ import { CreateMinter } from "./create-minter"
 import { PlusCircle, Rocket, ArrowRight, ChevronLeft } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
-import Image from 'next/image'
 
 export default function NFTLaunchpadMain() {
   const [selectedOption, setSelectedOption] = useState<'create' | 'minter' | null>(null)
