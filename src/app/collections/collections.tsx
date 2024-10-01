@@ -52,15 +52,7 @@ export default function Collections({ onCollectionSelect }: CollectionsProps) {
 
   return (
     <div className="relative min-h-screen w-screen  text-white overflow-hidden" ref={containerRef}>
-      <motion.div 
-        className="absolute inset-0 z-0"
-        style={{
-          backgroundImage: `url(${backgroundImages[0]})`,
-          backgroundSize: 'cover',
-          backgroundPosition: 'center',
-          filter: 'blur(10px) brightness(0.3)',
-        }}
-      />
+     
       <motion.h1 
         className="text-4xl font-bold mb-6 pt-8 text-center text-white mix-blend-difference sticky top-0 z-50"
         initial={{ opacity: 0, y: -50 }}
