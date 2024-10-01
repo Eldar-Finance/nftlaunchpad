@@ -3,10 +3,8 @@
 import { AuthRedirectWrapper } from '@/wrappers';
 import { ClientHooks } from '@/components/ClientHooks';
 import { CreateMinter } from './create';
-import { useGetAccountInfo } from '@/hooks';
 
 export default function Manager() {
-  const { address: connectedAddress } = useGetAccountInfo();
 
 
   return (
