@@ -93,7 +93,7 @@ export function CreateCollection({ onBack }: CreateCollectionProps) {
   const onSuccess = () => {
     console.log('Transaction successful');
     // You can add more logic here, like showing a success message or redirecting
-    router.push('/dashboard'); // Redirect to dashboard or wherever appropriate
+    router.push('/issue'); // Redirect to dashboard or wherever appropriate
   };
 
   const onFail = () => {
